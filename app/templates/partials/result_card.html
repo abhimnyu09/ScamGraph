@@ -1,0 +1,161 @@
+<!-- Result Card -->
+<div class="animate-fade-in" id="result-card">
+    <!-- Score Header -->
+    <div class="mb-6">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                {% set tier_class = 'risk-safe' if result.risk_tier == 'safe' else 'risk-caution' if result.risk_tier == 'caution' else 'risk-risky' %}
+                {% set tier_label = 'SAFE' if result.risk_tier == 'safe' else 'CAUTION' if result.risk_tier == 'caution' else 'RISKY' %}
+                {% set tier_emoji = '✅' if result.risk_tier == 'safe' else '⚠️' if result.risk_tier == 'caution' else '🔴' %}
+                <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold {% if result.risk_tier == 'safe' %}bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400{% elif result.risk_tier == 'caution' %}bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400{% else %}bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400{% endif %}">
+                    {{ tier_emoji }} {{ tier_label }}
+                </span>
+            </div>
+            <div class="text-right">
+                <p class="text-xs text-gray-500 dark:text-gray-400">Model v{{ result.model_version }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Analyzed just now</p>
+            </div>
+        </div>
+
+        <!-- Score Ring -->
+        <div class="flex items-center justify-center gap-8">
+            <div class="relative w-40 h-40">
+                <svg class="w-full h-full transform -rotate-90">
+                    <circle
+                        cx="64" cy="64" r="56"
+                        fill="none"
+                        stroke="#e5e7eb"
+                        stroke-width="10"
+                        class="dark:stroke-gray-700"
+                    ></circle>
+                    <circle
+                        cx="64" cy="64" r="56"
+                        fill="none"
+                        stroke="url(#gradient)"
+                        stroke-width="10"
+                        stroke-linecap="round"
+                        stroke-dasharray="352"
+                        stroke-dashoffset="{{ 352 - (352 * result.risk_score / 100) }}"
+                        class="score-ring"
+                    ></circle>
+                    <defs>
+                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            {% if result.risk_tier == 'safe' %}
+                            <stop offset="0%" stop-color="#10b981"></stop>
+                            <stop offset="100%" stop-color="#34d399"></stop>
+                            {% elif result.risk_tier == 'caution' %}
+                            <stop offset="0%" stop-color="#f59e0b"></stop>
+                            <stop offset="100%" stop-color="#fbbf24"></stop>
+                            {% else %}
+                            <stop offset="0%" stop-color="#ef4444"></stop>
+                            <stop offset="100%" stop-color="#f87171"></stop>
+                            {% endif %}
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <span class="text-4xl font-bold text-gray-900 dark:text-white">{{ result.risk_score }}</span>
+                </div>
+            </div>
+
+            <div class="text-left">
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Risk Score</p>
+                <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ result.risk_score }}/100</p>
+                <div class="w-48 h-2 bg-gray-200 dark:bg-gray-700 rounded-full mt-2 overflow-hidden">
+                    <div class="h-full {% if result.risk_tier == 'safe' %}bg-green-500{% elif result.risk_tier == 'caution' %}bg-yellow-500{% else %}bg-red-500{% endif %} rounded-full transition-all duration-1000" style="width: {{ result.risk_score }}%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary & Recommendation -->
+    <div class="grid sm:grid-cols-2 gap-4 mb-6">
+        <div class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+            <h4 class="font-medium text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                <i data-lucide="file-text" class="w-5 h-5 text-primary-600"></i>
+                Summary
+            </h4>
+            <p class="text-sm text-gray-600 dark:text-gray-300">{{ result.summary }}</p>
+        </div>
+        <div class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+            <h4 class="font-medium text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                <i data-lucide="lightbulb" class="w-5 h-5 text-yellow-500"></i>
+                Recommendation
+            </h4>
+            <p class="text-sm text-gray-600 dark:text-gray-300">{{ result.recommendation }}</p>
+        </div>
+    </div>
+
+    <!-- Evidence Checks Accordion -->
+    <div class="space-y-2">
+        <h4 class="font-medium text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+            <i data-lucide="list-checks" class="w-5 h-5 text-primary-600"></i>
+            Evidence Breakdown ({{ result.checks|length }} checks)
+        </h4>
+
+        {% for check in result.checks %}
+        <details class="group border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden {% if check.check_status == 'fail' %}border-red-300 dark:border-red-700 bg-red-50/50 dark:bg-red-900/10{% elif check.check_status == 'warning' %}border-yellow-300 dark:border-yellow-700 bg-yellow-50/50 dark:bg-yellow-900/10{% elif check.check_status == 'pass' %}border-green-300 dark:border-green-700 bg-green-50/50 dark:bg-green-900/10{% endif %}">
+            <summary class="flex items-center justify-between p-4 cursor-pointer list-none">
+                <div class="flex items-center gap-3">
+                    {% set status_icon = 'check-circle' if check.check_status == 'pass' else 'x-circle' if check.check_status == 'fail' else 'alert-triangle' if check.check_status == 'warning' else 'info' %}
+                    {% set status_color = 'text-green-600 dark:text-green-400' if check.check_status == 'pass' else 'text-red-600 dark:text-red-400' if check.check_status == 'fail' else 'text-yellow-600 dark:text-yellow-400' if check.check_status == 'warning' else 'text-blue-600 dark:text-blue-400' %}
+                    <i data-lucide="{{ status_icon }}" class="w-5 h-5 {{ status_color }} flex-shrink-0"></i>
+                    <div>
+                        <p class="font-medium text-gray-900 dark:text-white">{{ check.name }}</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ check.message }}</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="text-xs font-medium px-2 py-1 rounded {% if check.check_status == 'pass' %}bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400{% elif check.check_status == 'fail' %}bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400{% elif check.check_status == 'warning' %}bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400{% else %}bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400{% endif %}">
+                        {{ check.check_status.upper() }}
+                    </span>
+                    <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform"></i>
+                </div>
+            </summary>
+            {% if check.details %}
+            <div class="p-4 pt-0 border-t border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
+                <p class="text-sm text-gray-600 dark:text-gray-400">{{ check.details }}</p>
+            </div>
+            {% endif %}
+        </details>
+        {% endfor %}
+    </div>
+
+    <!-- Actions -->
+    <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-800 flex flex-wrap gap-3">
+        <button
+            hx-post="/analyze"
+            hx-target="#result-container"
+            hx-swap="innerHTML"
+            hx-include="[name='job_title'], [name='company_name'], [name='job_description'], [name='job_url'], [name='recruiter_name'], [name='recruiter_email'], [name='recruiter_phone'], [name='location'], [name='salary_text'], [name='employment_type'], [name='raw_text']"
+            class="px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 font-medium rounded-lg transition flex items-center gap-2"
+        >
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            Re-analyze
+        </button>
+        <a href="#" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition flex items-center gap-2"
+           onclick="navigator.share({title: 'ScamGraph Analysis', text: 'Job risk score: {{ result.risk_score }}/100 - {{ tier_label }}', url: window.location.href}); return false;">
+            <i data-lucide="share-2" class="w-4 h-4"></i>
+            Share
+        </a>
+        <button
+            onclick="window.print()"
+            class="px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 font-medium rounded-lg transition flex items-center gap-2"
+        >
+            <i data-lucide="printer" class="w-4 h-4"></i>
+            Print / Save PDF
+        </button>
+    </div>
+
+    <!-- Disclaimer -->
+    <p class="mt-6 text-xs text-gray-500 dark:text-gray-400 text-center">
+        ⚠️ This is an AI assessment based on patterns in training data. It can be wrong.
+        Always verify independently on the company's official careers page.
+        Never pay fees to apply for jobs.
+    </p>
+</div>
+
+<script>
+    // Initialize Lucide icons for dynamically added content
+    lucide.createIcons();
+</script>

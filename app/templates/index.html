@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen flex flex-col">
+    <!-- Hero Section -->
+    <header class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+        <div class="max-w-4xl mx-auto px-4 py-12 sm:py-16">
+            <div class="text-center">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 mb-6">
+                    <i data-lucide="shield-check" class="w-8 h-8"></i>
+                </div>
+                <h1 class="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+                    Detect Fake Jobs <span class="text-primary-600 dark:text-primary-400">Before You Apply</span>
+                </h1>
+                <p class="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-8">
+                    Paste a job description, drop a link, or forward a message.
+                    Get an instant 0–100 risk score with cited evidence.
+                </p>
+                <div class="flex flex-wrap items-center justify-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                    <span class="flex items-center gap-1.5"><i data-lucide="check-circle" class="w-4 h-4 text-risk-safe"></i>Free • No account needed</span>
+                    <span class="flex items-center gap-1.5"><i data-lucide="lock" class="w-4 h-4 text-primary-600"></i>Encrypted • No employer contact</span>
+                    <span class="flex items-center gap-1.5"><i data-lucide="brain" class="w-4 h-4 text-purple-600"></i>ML-powered • 18K+ training samples</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Form -->
+    <main class="flex-1 max-w-4xl mx-auto px-4 py-8 w-full">
+        <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
+            <!-- Tab Navigation -->
+            <div class="border-b border-gray-200 dark:border-gray-800">
+                <nav class="flex -mb-px" role="tablist">
+                    <button
+                        role="tab"
+                        id="tab-text"
+                        aria-selected="true"
+                        class="tab-btn flex-1 py-4 px-6 text-center font-medium text-primary-600 dark:text-primary-400 border-b-2 border-primary-600 dark:border-primary-400"
+                        hx-get="/partials/tab-text"
+                        hx-target="#tab-content"
+                        hx-swap="innerHTML"
+                        hx-trigger="click"
+                    >
+                        <i data-lucide="file-text" class="w-5 h-5 inline mr-2"></i>Paste Text
+                    </button>
+                    <button
+                        role="tab"
+                        id="tab-url"
+                        aria-selected="false"
+                        class="tab-btn flex-1 py-4 px-6 text-center font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 border-b-2 border-transparent"
+                        hx-get="/partials/tab-url"
+                        hx-target="#tab-content"
+                        hx-swap="innerHTML"
+                        hx-trigger="click"
+                    >
+                        <i data-lucide="link" class="w-5 h-5 inline mr-2"></i>Job URL
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Tab Content -->
+            <div id="tab-content" class="p-6">
+                {% include "partials/tab_text.html" %}
+            </div>
+        </div>
+
+        <!-- Trust Signals -->
+        <div class="mt-8 text-center">
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Trusted by job seekers • Powered by open data</p>
+            <div class="flex flex-wrap items-center justify-center gap-6 text-xs text-gray-400 dark:text-gray-500">
+                <span class="flex items-center gap-1"><i data-lucide="database" class="w-3 h-3"></i>Kaggle FJDC Dataset</span>
+                <span class="flex items-center gap-1"><i data-lucide="shield" class="w-3 h-3"></i>FTC/BBB/IC3 Patterns</span>
+                <span class="flex items-center gap-1"><i data-lucide="globe" class="w-3 h-3"></i>India-Specific Scam Patterns</span>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Result Modal/Section (HTMX target) -->
+<div id="result-container" class="mt-6"></div>
+
+<script>
+    // Tab switching logic
+    document.addEventListener('DOMContentLoaded', () => {
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        tabButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tabButtons.forEach(b => {
+                    b.classList.remove('text-primary-600', 'dark:text-primary-400', 'border-primary-600', 'dark:border-primary-400');
+                    b.classList.add('text-gray-500', 'dark:text-gray-400', 'border-transparent');
+                    b.setAttribute('aria-selected', 'false');
+                });
+                btn.classList.remove('text-gray-500', 'dark:text-gray-400', 'border-transparent');
+                btn.classList.add('text-primary-600', 'dark:text-primary-400', 'border-primary-600', 'dark:border-primary-400');
+                btn.setAttribute('aria-selected', 'true');
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.env
+*.egg-info/
+dist/
+build/
+
+# Model artifacts (use Git LFS or download at startup)
+app/model/artifacts/*.pkl
+app/model/artifacts/*.joblib
+app/model/artifacts/*.json
+
+# Data
+data/raw/
+data/processed/
+*.csv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Test coverage
+htmlcov/
+.coverage
+.pytest_cache/
