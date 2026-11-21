@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block title %}Profile & Settings — ScamGraph{% endblock %}
+
+{% block content %}
+<!-- Navigation Bar -->
+<nav class="fixed top-0 left-0 right-0 z-50 bg-bg-secondary/80 backdrop-blur-md border-b border-surface-border">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="flex items-center justify-between h-16">
+            <a href="/" class="flex items-center gap-2" aria-label="ScamGraph Home">
+                <div class="w-8 h-8 rounded-lg bg-brand-emerald flex items-center justify-center">
+                    <i data-lucide="shield-check" class="w-5 h-5 text-white"></i>
+                </div>
+                <span class="font-bold text-xl text-text-primary">ScamGraph</span>
+            </a>
+            <div class="hidden md:flex items-center gap-4">
+                <a href="/dashboard" class="btn-ghost px-4 py-2 text-sm">Dashboard</a>
+                <a href="/scanner" class="btn-primary px-5 py-2 text-sm">
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                    New Scan
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Profile Page -->
+<div class="pt-20 min-h-screen pb-12">
+    <div class="max-w-3xl mx-auto px-4">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex items-center gap-3 mb-4">
+                <a href="/dashboard" class="btn-ghost p-2">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                </a>
+                <div>
+                    <h1 class="text-2xl font-bold text-text-primary">Profile & Settings</h1>
+                    <p class="text-text-secondary">Manage your account and preferences</p>
+                </div>
+            </div>
+        </div>
+
+        {% if success %}
+        <div class="card p-4 mb-6 bg-brand-emeraldLight border-brand-emerald/30">
+            <div class="flex items-center gap-3">
+                <i data-lucide="check-circle" class="w-5 h-5 text-brand-emerald flex-shrink-0"></i>
+                <span class="text-sm text-brand-emerald">{{ success }}</span>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="space-y-6">
+            <!-- Account Info -->
+            <div class="card p-6">
+                <h3 class="font-semibold text-text-primary mb-4 flex items-center gap-2">
+                    <i data-lucide="user" class="w-5 h-5 text-brand-emerald"></i>
+                    Account Information
+                </h3>
+                <form method="POST" action="/dashboard/profile" class="space-y-4">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-text-secondary mb-1">Full Name</label>
+                        <input type="text" name="name" id="name" value="{{ user.name }}" required
+                            class="input-field">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-text-secondary mb-1">Email</label>
+                        <input type="email" name="email" id="email" value="{{ user.email }}" required disabled
+                            class="input-field opacity-50 cursor-not-allowed">
+                        <p class="mt-1 text-xs text-text-muted">Email cannot be changed. Contact support if needed.</p>
+                    </div>
+                    <div>
+                        <label for="role" class="block text-sm font-medium text-text-secondary mb-1">Role</label>
+                        <select name="role" id="role" disabled class="input-field opacity-50 cursor-not-allowed">
+                            <option value="job_seeker" {% if user.role == 'job_seeker' %}selected{% endif %}>Job Seeker</option>
+                            <option value="student" {% if user.role == 'student' %}selected{% endif %}>Student</option>
+                            <option value="recruiter" {% if user.role == 'recruiter' %}selected{% endif %}>Recruiter</option>
+                            <option value="other" {% if user.role == 'other' %}selected{% endif %}>Other</option>
+                        </select>
+                        <p class="mt-1 text-xs text-text-muted">Role is set during onboarding.</p>
+                    </div>
+                    <div class="pt-4 border-t border-surface-border">
+                        <button type="submit" class="btn-primary justify-center gap-2">
+                            <i data-lucide="save" class="w-4 h-4"></i>
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Notification Preferences -->
+            <div class="card p-6">
+                <h3 class="font-semibold text-text-primary mb-4 flex items-center gap-2">
+                    <i data-lucide="bell" class="w-5 h-5 text-brand-amber"></i>
+                    Notification Preferences
+                </h3>
+                <form method="POST" action="/dashboard/profile" class="space-y-4">
+                    <div class="space-y-4">
+                        {% set prefs = [
+                            ("email_notifications", "Email Notifications", "Receive scan results and weekly summaries via email"),
+                            ("scan_alerts", "Scam Alerts", "Real-time alerts when new scams are reported in your area"),
+                            ("weekly_digest", "Weekly Digest", "Weekly roundup of job market safety trends and tips")
+                        ] %}
+                        {% for key, label, desc in prefs %}
+                        <label class="flex items-center justify-between p-4 border border-surface-border rounded-xl hover:border-brand-emerald/50 transition-colors">
+                            <div class="flex items-center gap-4">
+                                <input type="checkbox" name="{{ key }}"
+                                    {% if user.preferences.get(key) %}checked{% endif %}
+                                    class="w-5 h-5 rounded border-surface-border bg-surface-tertiary text-brand-emerald focus:ring-brand-emerald">
+                                <div>
+                                    <p class="font-medium text-text-primary">{{ label }}</p>
+                                    <p class="text-sm text-text-secondary">{{ desc }}</p>
+                                </div>
+                            </div>
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <div class="pt-4 border-t border-surface-border">
+                        <button type="submit" class="btn-primary justify-center gap-2">
+                            <i data-lucide="save" class="w-4 h-4"></i>
+                            Save Preferences
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Security -->
+            <div class="card p-6">
+                <h3 class="font-semibold text-text-primary mb-4 flex items-center gap-2">
+                    <i data-lucide="shield" class="w-5 h-5 text-brand-red"></i>
+                    Security
+                </h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-4 border border-surface-border rounded-xl">
+                        <div>
+                            <p class="font-medium text-text-primary">Change Password</p>
+                            <p class="text-sm text-text-secondary">Update your account password</p>
+                        </div>
+                        <button class="btn-secondary" disabled>
+                            <i data-lucide="key" class="w-4 h-4 mr-2"></i>
+                            Change Password
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-between p-4 border border-surface-border rounded-xl">
+                        <div>
+                            <p class="font-medium text-text-primary">Two-Factor Authentication</p>
+                            <p class="text-sm text-text-secondary">Add an extra layer of security</p>
+                        </div>
+                        <button class="btn-secondary" disabled>
+                            <i data-lucide="smartphone" class="w-4 h-4 mr-2"></i>
+                            Enable 2FA
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-between p-4 border border-surface-border rounded-xl">
+                        <div>
+                            <p class="font-medium text-text-primary">Active Sessions</p>
+                            <p class="text-sm text-text-secondary">Manage logged-in devices</p>
+                        </div>
+                        <button class="btn-secondary" disabled>
+                            <i data-lucide="monitor" class="w-4 h-4 mr-2"></i>
+                            View Sessions
+                        </button>
+                    </div>
+                </div>
+                <p class="text-xs text-text-muted mt-4 text-center">Security features coming soon</p>
+            </div>
+
+            <!-- Data & Privacy -->
+            <div class="card p-6">
+                <h3 class="font-semibold text-text-primary mb-4 flex items-center gap-2">
+                    <i data-lucide="database" class="w-5 h-5 text-brand-blue"></i>
+                    Data & Privacy
+                </h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-4 border border-surface-border rounded-xl">
+                        <div>
+                            <p class="font-medium text-text-primary">Export My Data</p>
+                            <p class="text-sm text-text-secondary">Download all your scan history and account data</p>
+                        </div>
+                        <button class="btn-secondary" onclick="exportUserData()">
+                            <i data-lucide="download" class="w-4 h-4 mr-2"></i>
+                            Export Data
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-between p-4 border border-surface-border rounded-xl">
+                        <div>
+                            <p class="font-medium text-text-primary">Delete Account</p>
+                            <p class="text-sm text-text-secondary">Permanently delete your account and all data</p>
+                        </div>
+                        <button class="btn-ghost text-brand-red hover:bg-brand-redLight" disabled>
+                            <i data-lucide="trash-2" class="w-4 h-4 mr-2"></i>
+                            Delete Account
+                        </button>
+                    </div>
+                </div>
+                <p class="text-xs text-text-muted mt-4 text-center">Data export available; account deletion coming soon</p>
+            </div>
+
+            <!-- Danger Zone -->
+            <div class="card p-6 border-brand-red/20">
+                <h3 class="font-semibold text-brand-red mb-4 flex items-center gap-2">
+                    <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                    Danger Zone
+                </h3>
+                <p class="text-text-secondary text-sm mb-4">These actions are irreversible.</p>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button class="btn-ghost text-brand-red hover:bg-brand-redLight" disabled>
+                        <i data-lucide="trash-2" class="w-4 h-4 mr-2"></i>
+                        Delete All Scan History
+                    </button>
+                    <button class="btn-ghost text-brand-red hover:bg-brand-redLight" disabled>
+                        <i data-lucide="user-x" class="w-4 h-4 mr-2"></i>
+                        Delete Account Permanently
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.lucide) lucide.createIcons();
+    });
+
+    function exportUserData() {
+        // Get scan history from the page or fetch from API
+        const scans = {{ scan_history | tojson }};
+        const userData = {
+            name: "{{ user.name }}",
+            email: "{{ user.email }}",
+            role: "{{ user.role }}",
+            preferences: {{ user.preferences | tojson }},
+            scan_history: scans,
+            exported_at: new Date().toISOString()
+        };
+
+        const blob = new Blob([JSON.stringify(userData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `scamgraph-data-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+</script>
+{% endblock %}

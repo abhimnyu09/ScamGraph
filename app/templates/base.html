@@ -14,65 +14,42 @@
             theme: {
                 extend: {
                     colors: {
-                        // JobScamScore inspired dark theme
+                        // JobScamScore inspired dark theme - Updated Design System
+                        bg: {
+                            primary: '#080D16',
+                            secondary: '#101827',
+                            tertiary: '#111C2B',
+                        },
                         surface: {
-                            50: '#0a0f1a',
-                            100: '#0d1423',
-                            200: '#111a2e',
-                            300: '#16223a',
-                            400: '#1b2d4b',
-                            500: '#1f3a5c',
-                            600: '#24456d',
-                            700: '#2a507e',
-                            800: '#2f5d8f',
-                            900: '#346aa0',
+                            primary: '#080D16',
+                            secondary: '#101827',
+                            card: '#111C2B',
+                            cardHover: '#142335',
+                            border: '#263445',
+                            borderHover: '#2E3E52',
                         },
-                        card: {
-                            DEFAULT: '#0f172a',
-                            hover: '#141f3a',
-                            border: '#1e2a4a',
+                        text: {
+                            primary: '#F8FAFC',
+                            secondary: '#CBD5E1',
+                            muted: '#94A3B8',
+                            placeholder: '#64748B',
                         },
-                        emerald: {
-                            50: '#ecfdf5',
-                            100: '#d1fae5',
-                            200: '#a7f3d0',
-                            300: '#6ee7b7',
-                            400: '#34d399',
-                            500: '#10b981',
-                            600: '#059669',
-                            700: '#047857',
-                            800: '#065f46',
-                            900: '#064e3b',
-                            950: '#022c22',
+                        brand: {
+                            emerald: '#10B981',
+                            emeraldHover: '#059669',
+                            emeraldLight: '#10B981/15',
+                            amber: '#F59E0B',
+                            amberHover: '#D97706',
+                            amberLight: '#F59E0B/15',
+                            red: '#EF4444',
+                            redHover: '#DC2626',
+                            redLight: '#EF4444/15',
                         },
-                        amber: {
-                            50: '#fffbeb',
-                            100: '#fef3c7',
-                            200: '#fde68a',
-                            300: '#fcd34d',
-                            400: '#fbbf24',
-                            500: '#f59e0b',
-                            600: '#d97706',
-                            700: '#b45309',
-                            800: '#92400e',
-                            900: '#78350f',
-                        },
-                        red: {
-                            50: '#fef2f2',
-                            100: '#fee2e2',
-                            200: '#fecaca',
-                            300: '#fca5a5',
-                            400: '#f87171',
-                            500: '#ef4444',
-                            600: '#dc2626',
-                            700: '#b91c1c',
-                            800: '#991b1b',
-                            900: '#7f1d1d',
-                        },
-                        slate: {
-                            850: '#1e293b',
-                            900: '#0f172a',
-                            950: '#020617',
+                        accent: {
+                            blue: '#3B82F6',
+                            blueLight: '#3B82F6/15',
+                            purple: '#8B5CF6',
+                            purpleLight: '#8B5CF6/15',
                         }
                     },
                     fontFamily: {
@@ -80,11 +57,11 @@
                         mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'monospace'],
                     },
                     boxShadow: {
+                        'card': '0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2)',
+                        'card-hover': '0 4px 12px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3)',
                         'glow-emerald': '0 0 20px rgba(16, 185, 129, 0.15), 0 0 40px rgba(16, 185, 129, 0.05)',
                         'glow-amber': '0 0 20px rgba(245, 158, 11, 0.15), 0 0 40px rgba(245, 158, 11, 0.05)',
                         'glow-red': '0 0 20px rgba(239, 68, 68, 0.15), 0 0 40px rgba(239, 68, 68, 0.05)',
-                        'card': '0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2)',
-                        'card-hover': '0 4px 12px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3)',
                     },
                     animation: {
                         'fade-in': 'fadeIn 0.3s ease-out',
@@ -150,20 +127,20 @@
         .font-mono { font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace; }
 
         /* Custom scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #0a0f1a; }
-        ::-webkit-scrollbar-thumb { background: #1e2a4a; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #2a3f5e; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #080D16; }
+        ::-webkit-scrollbar-thumb { background: #263445; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #2E3E52; }
 
         /* Focus styles */
-        .focus-ring:focus { outline: none; ring: 2px; ring-color: #10b981; ring-offset: 2px; ring-offset-color: #0a0f1a; }
+        .focus-ring:focus { outline: none; box-shadow: 0 0 0 2px #10B981, 0 0 0 4px #080D16; }
 
         /* Accordion animations */
         .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, opacity 0.2s ease-out; opacity: 0; }
         .accordion-content.open { max-height: 800px; opacity: 1; transition: max-height 0.5s ease-in, opacity 0.3s ease-in; }
 
         /* Loading skeleton */
-        .loading-skeleton { background: linear-gradient(90deg, #111a2e 25%, #16223a 50%, #111a2e 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+        .loading-skeleton { background: linear-gradient(90deg, #111C2B 25%, #142335 50%, #111C2B 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
 
         /* Tab transitions */
         .tab-panel { display: none; animation: fadeIn 0.2s ease-out; }
@@ -176,45 +153,56 @@
         .htmx-swapping { opacity: 0; transition: opacity 100ms ease-out; }
         .htmx-added { animation: fadeIn 0.3s ease-out; }
 
-        /* Input enhancement */
+        /* Input enhancement - FIXED for contrast */
         .input-field {
-            @apply w-full px-4 py-3 bg-surface-100 border border-card-border text-white placeholder:text-surface-500 rounded-lg
-            transition-all duration-200 focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 focus:bg-surface-200;
+            @apply w-full px-4 py-3 bg-bg-tertiary border border-surface-border text-text-primary placeholder:text-text-placeholder rounded-lg
+            transition-all duration-200 focus:ring-2 focus:ring-brand-emerald/50 focus:border-brand-emerald focus:bg-surface-secondary;
         }
         .input-field:disabled { @apply opacity-50 cursor-not-allowed; }
+        .input-field::placeholder { color: #64748B; }
 
-        /* Button styles */
+        /* Button styles - FIXED for contrast */
         .btn-primary {
-            @apply px-6 py-3 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-semibold rounded-lg
-            transition-all duration-200 focus:ring-2 focus:ring-emerald-500/50 focus:ring-offset-2 focus:ring-offset-surface-50
+            @apply px-6 py-3 bg-brand-emerald hover:bg-brand-emeraldHover active:bg-emerald-700 text-white font-semibold rounded-lg
+            transition-all duration-200 focus:ring-2 focus:ring-brand-emerald/50 focus:ring-offset-2 focus:ring-offset-bg-primary
             disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2;
         }
         .btn-secondary {
-            @apply px-6 py-3 bg-surface-200 hover:bg-surface-300 active:bg-surface-400 text-white font-semibold rounded-lg
-            border border-card-border transition-all duration-200 focus:ring-2 focus:ring-surface-400 focus:ring-offset-2 focus:ring-offset-surface-50
+            @apply px-6 py-3 bg-surface-secondary hover:bg-surface-tertiary active:bg-surface-border text-text-primary font-semibold rounded-lg
+            border border-surface-border transition-all duration-200 focus:ring-2 focus:ring-surface-border focus:ring-offset-2 focus:ring-offset-bg-primary
             disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2;
         }
         .btn-ghost {
-            @apply px-4 py-2 hover:bg-surface-200 active:bg-surface-300 text-surface-300 hover:text-white font-medium rounded-lg
+            @apply px-4 py-2 hover:bg-surface-secondary active:bg-surface-tertiary text-text-secondary hover:text-text-primary font-medium rounded-lg
             transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2;
         }
 
         /* Card styles */
-        .card { @apply bg-card-DEFAULT border border-card-border rounded-xl shadow-card transition-all duration-300; }
-        .card-hover:hover { @apply shadow-card-hover border-emerald-500/20; }
+        .card { @apply bg-surface-card border border-surface-border rounded-xl shadow-card transition-all duration-300; }
+        .card-hover:hover { @apply shadow-card-hover border-surface-borderHover; }
 
         /* Glass effect for modals */
-        .glass { backdrop-filter: blur(12px); background: rgba(10, 15, 26, 0.9); }
+        .glass { backdrop-filter: blur(12px); background: rgba(8, 13, 22, 0.9); }
 
         /* Gradient text */
-        .gradient-emerald { background: linear-gradient(135deg, #10b981 0%, #34d399 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .gradient-amber { background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .gradient-red { background: linear-gradient(135deg, #ef4444 0%, #f87171 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .gradient-emerald { background: linear-gradient(135deg, #10B981 0%, #34D399 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .gradient-amber { background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .gradient-red { background: linear-gradient(135deg, #EF4444 0%, #F87171 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+        /* Utility classes for text contrast */
+        .text-primary { color: #F8FAFC; }
+        .text-secondary { color: #CBD5E1; }
+        .text-muted { color: #94A3B8; }
+        .text-placeholder { color: #64748B; }
+
+        /* Link styles for better contrast */
+        .link-primary { @apply text-brand-emerald hover:text-emerald-400 transition-colors; }
+        .link-muted { @apply text-text-muted hover:text-text-secondary transition-colors; }
     </style>
 
     {% block head %}{% endblock %}
 </head>
-<body class="bg-surface-50 text-white min-h-screen antialiased">
+<body class="bg-bg-primary text-text-primary min-h-screen antialiased">
     <!-- Theme is always dark for JobScamScore style -->
     <script>
         // Force dark theme
@@ -225,42 +213,42 @@
     {% block content %}{% endblock %}
 
     <!-- Global Footer -->
-    <footer class="border-t border-card-border py-8 px-4 mt-auto">
+    <footer class="border-t border-surface-border py-8 px-4 mt-auto">
         <div class="max-w-7xl mx-auto">
             <div class="grid md:grid-cols-4 gap-8 mb-8">
                 <div>
-                    <h4 class="font-semibold text-white mb-4">ScamGraph</h4>
-                    <p class="text-surface-400 text-sm leading-relaxed">
+                    <h4 class="font-semibold text-text-primary mb-4">ScamGraph</h4>
+                    <p class="text-text-secondary text-sm leading-relaxed">
                         Detect fake job postings before you apply. Built with ML-powered analysis and evidence-based verdicts.
                     </p>
                 </div>
                 <div>
-                    <h4 class="font-semibold text-white mb-4">Resources</h4>
-                    <ul class="space-y-2 text-sm text-surface-400">
-                        <li><a href="#" class="hover:text-emerald-400 transition-colors">FTC Job Scam Alerts</a></li>
-                        <li><a href="#" class="hover:text-emerald-400 transition-colors">BBB Scam Tracker</a></li>
-                        <li><a href="#" class="hover:text-emerald-400 transition-colors">FBI IC3 Reports</a></li>
-                        <li><a href="#" class="hover:text-emerald-400 transition-colors">Red Flags Guide</a></li>
+                    <h4 class="font-semibold text-text-primary mb-4">Resources</h4>
+                    <ul class="space-y-2 text-sm text-text-secondary">
+                        <li><a href="#" class="link-muted">FTC Job Scam Alerts</a></li>
+                        <li><a href="#" class="link-muted">BBB Scam Tracker</a></li>
+                        <li><a href="#" class="link-muted">FBI IC3 Reports</a></li>
+                        <li><a href="#" class="link-muted">Red Flags Guide</a></li>
                     </ul>
                 </div>
                 <div>
-                    <h4 class="font-semibold text-white mb-4">Legal</h4>
-                    <ul class="space-y-2 text-sm text-surface-400">
-                        <li><a href="#" class="hover:text-emerald-400 transition-colors">Privacy Policy</a></li>
-                        <li><a href="#" class="hover:text-emerald-400 transition-colors">Terms of Service</a></li>
-                        <li><a href="#" class="hover:text-emerald-400 transition-colors">Cookie Policy</a></li>
+                    <h4 class="font-semibold text-text-primary mb-4">Legal</h4>
+                    <ul class="space-y-2 text-sm text-text-secondary">
+                        <li><a href="#" class="link-muted">Privacy Policy</a></li>
+                        <li><a href="#" class="link-muted">Terms of Service</a></li>
+                        <li><a href="#" class="link-muted">Cookie Policy</a></li>
                     </ul>
                 </div>
                 <div>
-                    <h4 class="font-semibold text-white mb-4">Connect</h4>
-                    <ul class="space-y-2 text-sm text-surface-400">
-                        <li><a href="https://github.com/abhimnyu09/ScamGraph" target="_blank" class="hover:text-emerald-400 transition-colors flex items-center gap-2"><i data-lucide="github" class="w-4 h-4"></i>GitHub</a></li>
-                        <li><a href="#" class="hover:text-emerald-400 transition-colors flex items-center gap-2"><i data-lucide="twitter" class="w-4 h-4"></i>Twitter</a></li>
-                        <li><a href="#" class="hover:text-emerald-400 transition-colors flex items-center gap-2"><i data-lucide="mail" class="w-4 h-4"></i>Contact</a></li>
+                    <h4 class="font-semibold text-text-primary mb-4">Connect</h4>
+                    <ul class="space-y-2 text-sm text-text-secondary">
+                        <li><a href="https://github.com/abhimnyu09/ScamGraph" target="_blank" class="link-muted flex items-center gap-2"><i data-lucide="github" class="w-4 h-4"></i>GitHub</a></li>
+                        <li><a href="#" class="link-muted flex items-center gap-2"><i data-lucide="twitter" class="w-4 h-4"></i>Twitter</a></li>
+                        <li><a href="#" class="link-muted flex items-center gap-2"><i data-lucide="mail" class="w-4 h-4"></i>Contact</a></li>
                     </ul>
                 </div>
             </div>
-            <div class="pt-6 border-t border-card-border flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-surface-500">
+            <div class="pt-6 border-t border-surface-border flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-text-muted">
                 <p>Analyzed securely over encrypted connection — we never contact the employer</p>
                 <p class="flex items-center gap-4">
                     <span>Model: TF-IDF + XGBoost on 18K+ labeled postings</span>

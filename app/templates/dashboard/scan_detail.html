@@ -1,0 +1,333 @@
+{% extends "base.html" %}
+
+{% block title %}{{ scan.job_title }} — ScamGraph{% endblock %}
+
+{% block head %}
+<meta property="og:title" content="ScamGraph Analysis: {{ scan.job_title }}">
+<meta property="og:description" content="{{ scan.summary }}">
+<meta property="og:type" content="website">
+{% endblock %}
+
+{% block content %}
+<!-- Navigation Bar -->
+<nav class="fixed top-0 left-0 right-0 z-50 bg-bg-secondary/80 backdrop-blur-md border-b border-surface-border">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="flex items-center justify-between h-16">
+            <a href="/" class="flex items-center gap-2" aria-label="ScamGraph Home">
+                <div class="w-8 h-8 rounded-lg bg-brand-emerald flex items-center justify-center">
+                    <i data-lucide="shield-check" class="w-5 h-5 text-white"></i>
+                </div>
+                <span class="font-bold text-xl text-text-primary">ScamGraph</span>
+            </a>
+            <div class="hidden md:flex items-center gap-4">
+                <a href="/dashboard" class="btn-ghost px-4 py-2 text-sm">Dashboard</a>
+                <a href="/scanner" class="btn-primary px-5 py-2 text-sm">
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                    New Scan
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Scan Detail -->
+<div class="pt-20 min-h-screen pb-12">
+    <div class="max-w-5xl mx-auto px-4">
+        <!-- Header -->
+        <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <a href="/dashboard/history" class="btn-ghost p-2">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                </a>
+                <div>
+                    <h1 class="text-2xl font-bold text-text-primary">{{ scan.job_title }}</h1>
+                    <p class="text-text-secondary">{{ scan.company_name }}</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="window.print()" class="btn-ghost p-2" title="Print">
+                    <i data-lucide="printer" class="w-4 h-4"></i>
+                </button>
+                <button onclick="shareResult()" class="btn-ghost p-2" title="Share">
+                    <i data-lucide="share-2" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Score Card -->
+        <div class="card p-6 mb-6">
+            <div class="flex flex-col lg:flex-row lg:items-center gap-8">
+                <!-- Score Ring -->
+                <div class="flex-shrink-0 mx-auto lg:mx-0">
+                    <div class="relative w-48 h-48">
+                        <svg class="w-full h-full transform -rotate-90">
+                            <circle
+                                cx="96" cy="96" r="84"
+                                fill="none"
+                                stroke="#263445"
+                                stroke-width="12"
+                            ></circle>
+                            <circle
+                                cx="96" cy="96" r="84"
+                                fill="none"
+                                stroke="url(#score-gradient)"
+                                stroke-width="12"
+                                stroke-linecap="round"
+                                stroke-dasharray="527.8"
+                                stroke-dashoffset="{{ 527.8 - (527.8 * scan.risk_score / 100) }}"
+                                class="score-ring"
+                            ></circle>
+                            <defs>
+                                <linearGradient id="score-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    {% if scan.risk_score >= 70 %}
+                                    <stop offset="0%" stop-color="#EF4444"></stop>
+                                    <stop offset="100%" stop-color="#F87171"></stop>
+                                    {% elif scan.risk_score >= 40 %}
+                                    <stop offset="0%" stop-color="#F59E0B"></stop>
+                                    <stop offset="100%" stop-color="#FBBF24"></stop>
+                                    {% else %}
+                                    <stop offset="0%" stop-color="#10B981"></stop>
+                                    <stop offset="100%" stop-color="#34D399"></stop>
+                                    {% endif %}
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="text-center">
+                                <span class="text-5xl font-bold text-text-primary">{{ scan.risk_score }}</span>
+                                <div class="text-xs text-text-muted mt-1">/100</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Verdict & Meta -->
+                <div class="flex-1 text-center lg:text-left">
+                    <div class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold mb-4
+                        {% if scan.risk_tier == 'safe' %}bg-brand-emeraldLight text-brand-emerald
+                        {% elif scan.risk_tier == 'caution' %}bg-brand-amberLight text-brand-amber
+                        {% else %}bg-brand-redLight text-brand-red{% endif %}">
+                        {% if scan.risk_tier == 'safe' %}
+                        <i data-lucide="shield-check" class="w-4 h-4"></i>
+                        {% elif scan.risk_tier == 'caution' %}
+                        <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+                        {% else %}
+                        <i data-lucide="x-circle" class="w-4 h-4"></i>
+                        {% endif %}
+                        {{ scan.risk_tier|upper }}
+                    </div>
+
+                    <p class="text-text-secondary mb-4">{{ scan.summary }}</p>
+
+                    <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-sm text-text-muted">
+                        <span class="flex items-center gap-1">
+                            <i data-lucide="calendar" class="w-4 h-4"></i>
+                            Scanned {{ scan.timestamp[:10] }} at {{ scan.timestamp[11:16] }}
+                        </span>
+                        {% if scan.job_url %}
+                        <a href="{{ scan.job_url }}" target="_blank" rel="noopener" class="flex items-center gap-1 text-brand-emerald hover:text-brand-emeraldHover">
+                            <i data-lucide="external-link" class="w-4 h-4"></i>
+                            Original Posting
+                        </a>
+                        {% endif %}
+                        {% if scan.recruiter_email %}
+                        <span class="flex items-center gap-1">
+                            <i data-lucide="mail" class="w-4 h-4"></i>
+                            {{ scan.recruiter_email }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommendation -->
+        <div class="card p-6 mb-6">
+            <h3 class="font-semibold text-text-primary mb-3 flex items-center gap-2">
+                <i data-lucide="lightbulb" class="w-5 h-5 text-brand-amber"></i>
+                Recommendation
+            </h3>
+            <div class="prose prose-invert max-w-none text-text-secondary">
+                {{ scan.recommendation | safe if scan.recommendation else scan.summary }}
+            </div>
+        </div>
+
+        <!-- Evidence Breakdown - Expandable Categories -->
+        <div class="card p-6 mb-6">
+            <h3 class="font-semibold text-text-primary mb-4 flex items-center gap-2">
+                <i data-lucide="list-checks" class="w-5 h-5 text-brand-emerald"></i>
+                Evidence Breakdown ({{ scan.checks|length }} checks)
+            </h3>
+
+            <div class="space-y-2">
+                {% for check in scan.checks %}
+                <details class="group border border-surface-border rounded-xl overflow-hidden
+                    {% if check.check_status == 'fail' %}border-brand-red/30 bg-brand-redLight
+                    {% elif check.check_status == 'warning' %}border-brand-amber/30 bg-brand-amberLight
+                    {% elif check.check_status == 'pass' %}border-brand-emerald/30 bg-brand-emeraldLight
+                    {% else %}border-brand-blue/30 bg-brand-blueLight{% endif %}">
+                    <summary class="flex items-center justify-between p-4 cursor-pointer list-none">
+                        <div class="flex items-center gap-3">
+                            {% set status_icon = 'check-circle' if check.check_status == 'pass' else 'x-circle' if check.check_status == 'fail' else 'alert-triangle' if check.check_status == 'warning' else 'info' %}
+                            {% set status_color = 'text-brand-emerald' if check.check_status == 'pass' else 'text-brand-red' if check.check_status == 'fail' else 'text-brand-amber' if check.check_status == 'warning' else 'text-brand-blue' %}
+                            <i data-lucide="{{ status_icon }}" class="w-5 h-5 {{ status_color }} flex-shrink-0"></i>
+                            <div>
+                                <p class="font-medium text-text-primary">{{ check.name }}</p>
+                                <p class="text-sm text-text-secondary">{{ check.message }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="px-2 py-1 text-xs font-medium rounded-full
+                                {% if check.check_status == 'pass' %}bg-brand-emeraldLight text-brand-emerald
+                                {% elif check.check_status == 'fail' %}bg-brand-redLight text-brand-red
+                                {% elif check.check_status == 'warning' %}bg-brand-amberLight text-brand-amber
+                                {% else %}bg-brand-blueLight text-brand-blue{% endif %}">
+                                {{ check.check_status|upper }}
+                            </span>
+                            <span class="text-xs text-text-muted font-mono">Weight: {{ check.weight }}x</span>
+                            <i data-lucide="chevron-down" class="w-5 h-5 text-text-muted group-open:rotate-180 transition-transform"></i>
+                        </div>
+                    </summary>
+
+                    {% if check.details %}
+                    <div class="p-4 pt-0 border-t border-surface-border bg-bg-secondary">
+                        <p class="text-sm text-text-secondary">{{ check.details }}</p>
+                    </div>
+                    {% endif %}
+                </details>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Verification Categories (expandable) -->
+        <div class="card p-6 mb-6">
+            <h3 class="font-semibold text-text-primary mb-4 flex items-center gap-2">
+                <i data-lucide="layers" class="w-5 h-5 text-brand-emerald"></i>
+                Verification Categories
+            </h3>
+
+            <div class="space-y-2">
+                {% set categories = [
+                    ("Company Authentication", "Verifies legal entity registration, domain ownership, and business legitimacy", "building-2", "emerald", [
+                        ("Business Registration", "Company is registered with official government registry", "pass"),
+                        ("Domain Ownership", "Domain matches registered business name", "pass"),
+                        ("Physical Address", "Verified office location exists", "warning"),
+                        ("Years in Operation", "Company has been operating for 5+ years", "pass")
+                    ]),
+                    ("Careers Page Verification", "Cross-references posting with official company careers page listings", "globe", "emerald", [
+                        ("Listing Found on Careers Page", "Job posting exists on official careers portal", "pass"),
+                        ("Application Redirects to Official ATS", "Apply button links to Greenhouse/Lever/Workday", "pass"),
+                        ("Posting Date Consistency", "Posted date matches careers page", "pass")
+                    ]),
+                    ("Recruiter Identity", "Validates recruiter email domain, LinkedIn presence, and company affiliation", "user-check", "amber", [
+                        ("Corporate Email Domain", "Recruiter uses @company.com email", "pass"),
+                        ("LinkedIn Profile Verified", "Recruiter profile matches company", "warning"),
+                        ("Employee Directory Match", "Name appears in company directory", "info")
+                    ]),
+                    ("Salary Benchmarking", "Compares offered compensation against industry and role-specific ranges", "dollar-sign", "amber", [
+                        ("Within Market Range", "Offered salary matches industry benchmarks", "pass"),
+                        ("No Unrealistic Promises", "No 'earn 50k/month part-time' claims", "pass"),
+                        ("Clear Compensation Structure", "Base + bonus + equity breakdown provided", "info")
+                    ]),
+                    ("Scam Pattern Detection", "ML detection of task scams, fee fraud, identity theft patterns", "alert-triangle", "red", [
+                        ("Upfront Payment Request", "No registration/training/processing fees", "pass"),
+                        ("Task Scam Keywords", "No 'click', 'copy-paste', 'captcha' patterns", "pass"),
+                        ("Urgency Pressure", "No 'immediate start', 'limited slots' tactics", "pass"),
+                        ("Sensitive Info Requests", "No Aadhaar/PAN/bank details in posting", "pass")
+                    ]),
+                    ("Contact Validation", "Verifies phone numbers, email deliverability, and communication channels", "phone", "amber", [
+                        ("Corporate Phone Number", "Contact number matches company", "warning"),
+                        ("Official Email Channel", "Communication via company domain", "pass"),
+                        ("No Chat-App Only", "Not WhatsApp/Telegram exclusive", "pass")
+                    ]),
+                    ("Domain & SSL Intelligence", "Analyzes domain age, SSL certificates, hosting, and infrastructure", "lock", "emerald", [
+                        ("Domain Age > 1 Year", "Domain registered over 12 months ago", "pass"),
+                        ("Valid SSL Certificate", "HTTPS with valid certificate", "pass"),
+                        ("Reputable Hosting", "Hosted on known business infrastructure", "pass"),
+                        ("No Suspicious Subdomains", "No random subdomain patterns", "pass")
+                    ]),
+                    ("Live Threat Intelligence", "Checks against real-time scam databases and community reports", "activity", "red", [
+                        ("Not in Scam Database", "No matches in known scam reports", "pass"),
+                        ("No Community Flags", "No user reports for this company", "pass"),
+                        ("Clean IP Reputation", "Server IP not associated with fraud", "pass")
+                    ])
+                ] %}
+                {% for cat_name, cat_desc, cat_icon, cat_color, checks in categories %}
+                <details class="group border border-surface-border rounded-xl overflow-hidden">
+                    <summary class="flex items-center justify-between p-4 cursor-pointer list-none bg-surface-tertiary/50">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-brand-{{cat_color}}Light flex items-center justify-center">
+                                <i data-lucide="{{cat_icon}}" class="w-5 h-5 text-brand-{{cat_color}}"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-text-primary">{{cat_name}}</p>
+                                <p class="text-sm text-text-secondary">{{cat_desc}}</p>
+                            </div>
+                        </div>
+                        <i data-lucide="chevron-down" class="w-5 h-5 text-text-muted group-open:rotate-180 transition-transform"></i>
+                    </summary>
+
+                    <div class="p-4 pt-0 space-y-3">
+                        {% for check_name, check_desc, check_status in checks %}
+                        <div class="flex items-center gap-3 p-3 bg-surface-tertiary/50 rounded-lg">
+                            {% if check_status == 'pass' %}
+                            <i data-lucide="check-circle" class="w-5 h-5 text-brand-emerald flex-shrink-0"></i>
+                            {% elif check_status == 'warning' %}
+                            <i data-lucide="alert-triangle" class="w-5 h-5 text-brand-amber flex-shrink-0"></i>
+                            {% elif check_status == 'fail' %}
+                            <i data-lucide="x-circle" class="w-5 h-5 text-brand-red flex-shrink-0"></i>
+                            {% else %}
+                            <i data-lucide="info" class="w-5 h-5 text-brand-blue flex-shrink-0"></i>
+                            {% endif %}
+                            <div class="flex-1">
+                                <p class="font-medium text-text-primary">{{check_name}}</p>
+                                <p class="text-sm text-text-secondary">{{check_desc}}</p>
+                            </div>
+                            <span class="px-2 py-1 text-xs font-medium rounded-full
+                                {% if check_status == 'pass' %}bg-brand-emeraldLight text-brand-emerald
+                                {% elif check_status == 'warning' %}bg-brand-amberLight text-brand-amber
+                                {% elif check_status == 'fail' %}bg-brand-redLight text-brand-red
+                                {% else %}bg-brand-blueLight text-brand-blue{% endif %}">
+                                {{ check_status|upper }}
+                            </span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </details>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Raw Data (for debugging) -->
+        <details class="card p-4 mb-6">
+            <summary class="cursor-pointer list-none flex items-center justify-between text-sm text-text-muted">
+                <span>Raw Scan Data (Debug)</span>
+                <i data-lucide="chevron-down" class="w-5 h-5 group-open:rotate-180 transition-transform"></i>
+            </summary>
+            <pre class="mt-4 p-4 bg-surface-tertiary rounded-lg text-xs text-text-muted overflow-x-auto">{{ scan | tojson(indent=2) }}</pre>
+        </details>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.lucide) lucide.createIcons();
+    });
+
+    function shareResult() {
+        if (navigator.share) {
+            navigator.share({
+                title: `ScamGraph Analysis: {{ scan.job_title }}`,
+                text: `Job risk score: {{ scan.risk_score }}/100 - {{ scan.risk_tier|upper }}`,
+                url: window.location.href
+            });
+        } else {
+            navigator.clipboard.writeText(window.location.href);
+            alert('Link copied to clipboard!');
+        }
+    }
+</script>
+{% endblock %}

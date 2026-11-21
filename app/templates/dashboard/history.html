@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block title %}Scan History — ScamGraph{% endblock %}
+
+{% block content %}
+<!-- Navigation Bar -->
+<nav class="fixed top-0 left-0 right-0 z-50 bg-bg-secondary/80 backdrop-blur-md border-b border-surface-border">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="flex items-center justify-between h-16">
+            <a href="/" class="flex items-center gap-2" aria-label="ScamGraph Home">
+                <div class="w-8 h-8 rounded-lg bg-brand-emerald flex items-center justify-center">
+                    <i data-lucide="shield-check" class="w-5 h-5 text-white"></i>
+                </div>
+                <span class="font-bold text-xl text-text-primary">ScamGraph</span>
+            </a>
+            <div class="hidden md:flex items-center gap-4">
+                <a href="/scanner" class="btn-primary px-5 py-2 text-sm">
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                    New Scan
+                </a>
+                <div class="relative group">
+                    <button class="btn-ghost px-4 py-2 flex items-center gap-2">
+                        <span class="text-sm font-medium text-text-primary">{{ user.name }}</span>
+                        <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                    </button>
+                    <div class="absolute right-0 mt-2 w-48 bg-surface-card border border-surface-border rounded-xl shadow-card opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                        <a href="/dashboard" class="block px-4 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-tertiary">Dashboard</a>
+                        <a href="/dashboard/profile" class="block px-4 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-tertiary">Profile</a>
+                        <a href="/logout" class="block px-4 py-2 text-sm text-brand-red hover:text-red-400 hover:bg-surface-tertiary">Sign Out</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Dashboard Layout -->
+<div class="pt-20 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 pb-12">
+        <div class="flex flex-col lg:flex-row gap-6">
+            <!-- Sidebar -->
+            <aside class="lg:w-64 flex-shrink-0">
+                <div class="card p-4 sticky top-24">
+                    <div class="flex items-center gap-3 mb-6 pb-4 border-b border-surface-border">
+                        <div class="w-10 h-10 rounded-lg bg-brand-emeraldLight flex items-center justify-center">
+                            <i data-lucide="user" class="w-5 h-5 text-brand-emerald"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="font-medium text-text-primary truncate">{{ user.name }}</p>
+                            <p class="text-xs text-text-muted truncate">{{ user.email }}</p>
+                        </div>
+                    </div>
+
+                    <nav class="space-y-1" aria-label="Dashboard navigation">
+                        <a href="/dashboard" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-tertiary transition-colors">
+                            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                            Overview
+                        </a>
+                        <a href="/dashboard/history" class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-brand-emeraldLight text-brand-emerald font-medium">
+                            <i data-lucide="history" class="w-5 h-5"></i>
+                            Scan History
+                        </a>
+                        <a href="/dashboard/report" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-tertiary transition-colors">
+                            <i data-lucide="flag" class="w-5 h-5"></i>
+                            Report Scam
+                        </a>
+                        <a href="/dashboard/profile" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-tertiary transition-colors">
+                            <i data-lucide="settings" class="w-5 h-5"></i>
+                            Settings
+                        </a>
+                    </nav>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="flex-1 min-w-0">
+                <!-- Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                    <div>
+                        <h1 class="text-2xl font-bold text-text-primary">Scan History</h1>
+                        <p class="text-text-secondary mt-1">{{ total_scans }} total scans • Page {{ page }} of {{ total_pages }}</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <a href="/scanner" class="btn-primary justify-center gap-2">
+                            <i data-lucide="search" class="w-5 h-5"></i>
+                            New Scan
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="card p-4 mb-6">
+                    <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <label for="tier-filter" class="text-sm text-text-secondary whitespace-nowrap">Filter by:</label>
+                            <select name="tier" id="tier-filter"
+                                onchange="window.location.href = '/dashboard/history?tier=' + this.value"
+                                class="input-field w-auto px-3 py-2 text-sm">
+                                <option value="">All Verdicts</option>
+                                <option value="safe" {% if filter_tier == 'safe' %}selected{% endif %}>✅ Safe</option>
+                                <option value="caution" {% if filter_tier == 'caution' %}selected{% endif %}>⚠️ Caution</option>
+                                <option value="risky" {% if filter_tier == 'risky' %}selected{% endif %}>🔴 Risky</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button class="btn-secondary text-sm" onclick="exportHistory()">
+                                <i data-lucide="download" class="w-4 h-4"></i>
+                                Export CSV
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scans Table -->
+                <div class="card">
+                    {% if scans %}
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="text-left text-sm text-text-muted border-b border-surface-border">
+                                    <th class="p-4 font-medium text-text-secondary">Job Title</th>
+                                    <th class="p-4 font-medium text-text-secondary">Company</th>
+                                    <th class="p-4 font-medium text-text-secondary hidden md:table-cell">Score</th>
+                                    <th class="p-4 font-medium text-text-secondary">Verdict</th>
+                                    <th class="p-4 font-medium text-text-secondary">Date</th>
+                                    <th class="p-4 font-medium text-text-secondary">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-surface-border">
+                                {% for scan in scans %}
+                                <tr class="hover:bg-surface-tertiary/50 transition-colors">
+                                    <td class="p-4">
+                                        <div class="font-medium text-text-primary truncate max-w-xs">{{ scan.job_title }}</div>
+                                        {% if scan.job_url %}
+                                        <a href="{{ scan.job_url }}" target="_blank" rel="noopener" class="text-xs text-brand-emerald hover:text-brand-emeraldHover inline-flex items-center gap-1 mt-1">
+                                            <i data-lucide="external-link" class="w-3 h-3"></i>
+                                            View Posting
+                                        </a>
+                                        {% endif %}
+                                    </td>
+                                    <td class="p-4 text-text-secondary">{{ scan.company_name }}</td>
+                                    <td class="p-4 hidden md:table-cell">
+                                        <span class="font-mono font-semibold {% if scan.risk_score >= 70 %}text-brand-red{% elif scan.risk_score >= 40 %}text-brand-amber{% else %}text-brand-emerald{% endif %}">{{ scan.risk_score }}/100</span>
+                                    </td>
+                                    <td class="p-4">
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full
+                                            {% if scan.risk_tier == 'safe' %}bg-brand-emeraldLight text-brand-emerald
+                                            {% elif scan.risk_tier == 'caution' %}bg-brand-amberLight text-brand-amber
+                                            {% else %}bg-brand-redLight text-brand-red{% endif %}">
+                                            {{ scan.risk_tier|upper }}
+                                        </span>
+                                    </td>
+                                    <td class="p-4 text-sm text-text-muted">{{ scan.timestamp[:10] }} {{ scan.timestamp[11:16] }}</td>
+                                    <td class="p-4 text-right">
+                                        <div class="flex items-center justify-end gap-2">
+                                            <a href="/dashboard/scan/{{ scan.id }}" class="btn-ghost p-2" title="View Details">
+                                                <i data-lucide="eye" class="w-4 h-4"></i>
+                                            </a>
+                                            <button onclick="shareScan('{{ scan.id }}')" class="btn-ghost p-2" title="Share">
+                                                <i data-lucide="share-2" class="w-4 h-4"></i>
+                                            </button>
+                                            <button onclick="printScan('{{ scan.id }}')" class="btn-ghost p-2" title="Print">
+                                                <i data-lucide="printer" class="w-4 h-4"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if total_pages > 1 %}
+                    <div class="p-4 border-t border-surface-border flex items-center justify-between">
+                        <p class="text-sm text-text-muted">Showing {{ (page - 1) * 10 + 1 }} to {{ [(page * 10), total_scans]|min }} of {{ total_scans }} scans</p>
+                        <div class="flex items-center gap-2">
+                            {% if page > 1 %}
+                            <a href="/dashboard/history?page={{ page - 1 }}{% if filter_tier %}&tier={{ filter_tier }}{% endif %}" class="btn-ghost p-2">
+                                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                            </a>
+                            {% endif %}
+
+                            {% for p in range(max(1, page - 2), min(total_pages + 1, page + 3)) %}
+                            <a href="/dashboard/history?page={{ p }}{% if filter_tier %}&tier={{ filter_tier }}{% endif %}"
+                                class="px-3 py-1.5 rounded-lg text-sm font-medium
+                                    {% if p == page %}bg-brand-emeraldLight text-brand-emerald{% else %}text-text-secondary hover:bg-surface-tertiary{% endif %}">
+                                {{ p }}
+                            </a>
+                            {% endfor %}
+
+                            {% if page < total_pages %}
+                            <a href="/dashboard/history?page={{ page + 1 }}{% if filter_tier %}&tier={{ filter_tier }}{% endif %}" class="btn-ghost p-2">
+                                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <div class="p-12 text-center">
+                        <i data-lucide="history" class="w-16 h-16 text-text-muted mx-auto mb-4"></i>
+                        <h3 class="text-lg font-semibold text-text-primary mb-2">No scans found</h3>
+                        <p class="text-text-secondary mb-6">
+                            {% if filter_tier %}
+                            No scans with "{{ filter_tier }}" verdict. Try a different filter.
+                            {% else %}
+                            You haven't scanned any jobs yet.
+                            {% endif %}
+                        </p>
+                        <a href="/scanner" class="btn-primary justify-center gap-2 inline-flex">
+                            <i data-lucide="search" class="w-5 h-5"></i>
+                            Scan a Job
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </main>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.lucide) lucide.createIcons();
+    });
+
+    function exportHistory() {
+        // Create CSV from table data
+        const rows = document.querySelectorAll('tbody tr');
+        if (rows.length === 0) return;
+
+        let csv = 'Job Title,Company,Risk Score,Verdict,Date\n';
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            const title = cells[0].querySelector('div').textContent.trim().replace(/,/g, ';');
+            const company = cells[1].textContent.trim().replace(/,/g, ';');
+            const score = cells[2].textContent.trim();
+            const verdict = cells[3].querySelector('span').textContent.trim();
+            const date = cells[4].textContent.trim();
+            csv += `"${title}","${company}","${score}","${verdict}","${date}"\n`;
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `scamgraph-history-${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function shareScan(scanId) {
+        if (navigator.share) {
+            navigator.share({
+                title: 'ScamGraph Scan Result',
+                text: `Check out this job scan result on ScamGraph`,
+                url: `${window.location.origin}/dashboard/scan/${scanId}`
+            });
+        } else {
+            navigator.clipboard.writeText(`${window.location.origin}/dashboard/scan/${scanId}`);
+            alert('Link copied to clipboard!');
+        }
+    }
+
+    function printScan(scanId) {
+        window.open(`/dashboard/scan/${scanId}?print=true`, '_blank');
+    }
+</script>
+{% endblock %}
