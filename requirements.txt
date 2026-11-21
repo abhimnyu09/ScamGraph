@@ -24,5 +24,9 @@ pydantic==2.14.4
 tldextract==5.1.2
 python-whois==0.9.0
 
+# OCR for image analysis
+pillow==10.4.0
+pytesseract==0.3.10
+
 # Kaggle (for dataset download)
 kagglehub==0.3.6

@@ -1,6 +1,8 @@
 import os
 import logging
 import json
+import base64
+import io
 from contextlib import asynccontextmanager
 from typing import Optional
 
@@ -188,6 +190,81 @@ async def extract_url(request: Request):
     })
 
 
+async def scanner_page(request: Request):
+    """Scanner page with 3 input modes."""
+    return templates.TemplateResponse("scanner.html", {"request": request})
+
+
+async def analyze_image(request: Request):
+    """Analyze job posting from uploaded image (OCR + analysis)."""
+    form = await request.form()
+    image_file = form.get("image")
+
+    if not image_file:
+        return templates.TemplateResponse("partials/result_card.html", {
+            "request": request,
+            "result": None,
+            "error": "No image uploaded"
+        })
+
+    # Read image bytes
+    image_bytes = await image_file.read()
+
+    # Simple OCR using pytesseract if available, otherwise fallback
+    try:
+        from PIL import Image
+        import pytesseract
+
+        image = Image.open(io.BytesIO(image_bytes))
+        # Convert to RGB if needed
+        if image.mode != 'RGB':
+            image = image.convert('RGB')
+
+        # Extract text using OCR
+        extracted_text = pytesseract.image_to_string(image)
+
+        if not extracted_text.strip():
+            return templates.TemplateResponse("partials/result_card.html", {
+                "request": request,
+                "result": None,
+                "error": "No text could be extracted from the image. Please ensure the image is clear and contains readable text."
+            })
+
+        # Use the extracted text for analysis
+        # Try to parse title, company from first lines
+        lines = [line.strip() for line in extracted_text.split('\n') if line.strip()]
+        job_title = lines[0] if len(lines) > 0 else "Extracted from Image"
+        company_name = lines[1] if len(lines) > 1 else "Unknown Company"
+        job_description = extracted_text
+
+        result = predict_risk(
+            job_title=job_title[:200],
+            company_name=company_name[:200],
+            job_description=job_description,
+            raw_text=extracted_text
+        )
+
+        # Add note about OCR extraction
+        result.summary = f"[OCR Extracted] {result.summary}"
+
+    except ImportError:
+        # OCR not available, return error
+        return templates.TemplateResponse("partials/result_card.html", {
+            "request": request,
+            "result": None,
+            "error": "OCR functionality not available. Please install pytesseract and tesseract-ocr, or use text/URL input instead."
+        })
+    except Exception as e:
+        logger.error(f"Image analysis error: {e}")
+        return templates.TemplateResponse("partials/result_card.html", {
+            "request": request,
+            "result": None,
+            "error": f"Failed to analyze image: {str(e)}"
+        })
+
+    return templates.TemplateResponse("partials/result_card.html", {"request": request, "result": result})
+
+
 # --- Telegram Webhook ---
 async def telegram_webhook(request: Request):
     """Receive Telegram webhook updates."""
@@ -211,8 +288,10 @@ app = Starlette(
         Route("/partials/tab-text", partial_tab_text, methods=["GET"]),
         Route("/partials/tab-url", partial_tab_url, methods=["GET"]),
         Route("/", index, methods=["GET"]),
+        Route("/scanner", scanner_page, methods=["GET"]),
         Route("/analyze", analyze_form, methods=["POST"]),
         Route("/analyze/json", analyze_json, methods=["POST"]),
+        Route("/analyze/image", analyze_image, methods=["POST"]),
         Route("/extract-url", extract_url, methods=["POST"]),
         Route("/telegram/webhook", telegram_webhook, methods=["POST"]),
     ],

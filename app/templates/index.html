@@ -1,100 +1,606 @@
 {% extends "base.html" %}
 
+{% block head %}
+<meta property="og:title" content="ScamGraph — Fake Job Detector">
+<meta property="og:description" content="Check if a job is a scam before you reply. Paste a job description, drop a link, or upload a screenshot to get an instant 0–100 risk score with cited evidence.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+{% endblock %}
+
 {% block content %}
-<div class="min-h-screen flex flex-col">
-    <!-- Hero Section -->
-    <header class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
-        <div class="max-w-4xl mx-auto px-4 py-12 sm:py-16">
-            <div class="text-center">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 mb-6">
-                    <i data-lucide="shield-check" class="w-8 h-8"></i>
+<!-- Navigation Bar -->
+<nav class="fixed top-0 left-0 right-0 z-50 bg-surface-50/80 backdrop-blur-md border-b border-card-border">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="flex items-center justify-between h-16">
+            <!-- Logo -->
+            <a href="/" class="flex items-center gap-2" aria-label="ScamGraph Home">
+                <div class="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
+                    <i data-lucide="shield-check" class="w-5 h-5 text-white"></i>
                 </div>
-                <h1 class="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-                    Detect Fake Jobs <span class="text-primary-600 dark:text-primary-400">Before You Apply</span>
-                </h1>
-                <p class="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-8">
-                    Paste a job description, drop a link, or forward a message.
-                    Get an instant 0–100 risk score with cited evidence.
-                </p>
-                <div class="flex flex-wrap items-center justify-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-                    <span class="flex items-center gap-1.5"><i data-lucide="check-circle" class="w-4 h-4 text-risk-safe"></i>Free • No account needed</span>
-                    <span class="flex items-center gap-1.5"><i data-lucide="lock" class="w-4 h-4 text-primary-600"></i>Encrypted • No employer contact</span>
-                    <span class="flex items-center gap-1.5"><i data-lucide="brain" class="w-4 h-4 text-purple-600"></i>ML-powered • 18K+ training samples</span>
+                <span class="font-bold text-xl text-white">ScamGraph</span>
+            </a>
+
+            <!-- Desktop Navigation -->
+            <div class="hidden md:flex items-center gap-8">
+                <a href="#features" class="text-surface-300 hover:text-white text-sm font-medium transition-colors">Features</a>
+                <a href="#red-flags" class="text-surface-300 hover:text-white text-sm font-medium transition-colors">Red Flags</a>
+                <a href="/scanner" class="text-surface-300 hover:text-white text-sm font-medium transition-colors">Scanner</a>
+                <a href="/dashboard" class="btn-ghost px-4 py-2 text-sm">Sign In</a>
+                <a href="/scanner" class="btn-primary px-5 py-2 text-sm">Get Started</a>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button class="md:hidden btn-ghost p-2" id="mobile-menu-btn" aria-label="Open menu">
+                <i data-lucide="menu" class="w-5 h-5"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="md:hidden hidden bg-surface-50 border-t border-card-border" id="mobile-menu">
+        <div class="px-4 py-4 space-y-2">
+            <a href="#features" class="block px-3 py-2 text-surface-300 hover:text-white hover:bg-surface-100 rounded-lg text-sm font-medium">Features</a>
+            <a href="#red-flags" class="block px-3 py-2 text-surface-300 hover:text-white hover:bg-surface-100 rounded-lg text-sm font-medium">Red Flags</a>
+            <a href="/scanner" class="block px-3 py-2 text-surface-300 hover:text-white hover:bg-surface-100 rounded-lg text-sm font-medium">Scanner</a>
+            <a href="/dashboard" class="block px-3 py-2 text-surface-300 hover:text-white hover:bg-surface-100 rounded-lg text-sm font-medium">Sign In</a>
+            <a href="/scanner" class="btn-primary w-full justify-center mt-2">Get Started</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<header class="relative pt-32 pb-20 px-4 overflow-hidden">
+    <div class="max-w-7xl mx-auto">
+        <!-- Background glow -->
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-emerald-500/10 blur-3xl pointer-events-none"></div>
+        <div class="absolute top-1/4 right-0 w-[400px] h-[400px] rounded-full bg-amber-500/10 blur-3xl pointer-events-none"></div>
+
+        <div class="relative text-center max-w-4xl mx-auto">
+            <!-- Badge -->
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-100 border border-card-border mb-6 animate-fade-in">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-sm font-medium text-surface-300">New: Image & URL scanning now available</span>
+            </div>
+
+            <!-- Main Heading -->
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6 animate-slide-up">
+                Check if a job is a
+                <br>
+                <span class="gradient-emerald">scam before you reply</span>
+            </h1>
+
+            <!-- Description -->
+            <p class="text-lg sm:text-xl text-surface-300 max-w-2xl mx-auto mb-10 animate-slide-up" style="animation-delay: 100ms;">
+                Paste a job description, drop a link, or upload a screenshot.
+                Get an instant 0–100 risk score with cited evidence from 8 detection layers.
+            </p>
+
+            <!-- Trust Stats -->
+            <div class="flex flex-wrap items-center justify-center gap-6 sm:gap-10 mb-10 animate-slide-up" style="animation-delay: 200ms;">
+                <div class="text-center">
+                    <div class="text-3xl sm:text-4xl font-bold gradient-emerald">18K+</div>
+                    <div class="text-sm text-surface-400 mt-1">Training Samples</div>
+                </div>
+                <div class="w-px h-8 bg-card-border mx-2"></div>
+                <div class="text-center">
+                    <div class="text-3xl sm:text-4xl font-bold gradient-emerald">8</div>
+                    <div class="text-sm text-surface-400 mt-1">Detection Layers</div>
+                </div>
+                <div class="w-px h-8 bg-card-border mx-2"></div>
+                <div class="text-center">
+                    <div class="text-3xl sm:text-4xl font-bold gradient-emerald">< 60s</div>
+                    <div class="text-sm text-surface-400 mt-1">Avg Scan Time</div>
                 </div>
             </div>
-        </div>
-    </header>
 
-    <!-- Main Form -->
-    <main class="flex-1 max-w-4xl mx-auto px-4 py-8 w-full">
-        <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
-            <!-- Tab Navigation -->
-            <div class="border-b border-gray-200 dark:border-gray-800">
-                <nav class="flex -mb-px" role="tablist">
-                    <button
-                        role="tab"
-                        id="tab-text"
-                        aria-selected="true"
-                        class="tab-btn flex-1 py-4 px-6 text-center font-medium text-primary-600 dark:text-primary-400 border-b-2 border-primary-600 dark:border-primary-400"
-                        hx-get="/partials/tab-text"
-                        hx-target="#tab-content"
-                        hx-swap="innerHTML"
-                        hx-trigger="click"
-                    >
-                        <i data-lucide="file-text" class="w-5 h-5 inline mr-2"></i>Paste Text
-                    </button>
-                    <button
-                        role="tab"
-                        id="tab-url"
-                        aria-selected="false"
-                        class="tab-btn flex-1 py-4 px-6 text-center font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 border-b-2 border-transparent"
-                        hx-get="/partials/tab-url"
-                        hx-target="#tab-content"
-                        hx-swap="innerHTML"
-                        hx-trigger="click"
-                    >
-                        <i data-lucide="link" class="w-5 h-5 inline mr-2"></i>Job URL
-                    </button>
-                </nav>
+            <!-- Scanner Preview -->
+            <div class="relative animate-slide-up" style="animation-delay: 300ms;">
+                <div class="bg-card-DEFAULT border border-card-border rounded-2xl overflow-hidden shadow-card max-w-3xl mx-auto">
+                    <!-- Scanner Tabs -->
+                    <div class="flex border-b border-card-border bg-surface-100/50">
+                        <button class="tab-btn-scanner flex-1 py-3 px-4 text-sm font-medium text-white border-b-2 border-emerald-500 bg-surface-100" data-tab="text">
+                            <i data-lucide="file-text" class="w-4 h-4 inline mr-1"></i>Text
+                        </button>
+                        <button class="tab-btn-scanner flex-1 py-3 px-4 text-sm font-medium text-surface-400 hover:text-white" data-tab="url">
+                            <i data-lucide="link" class="w-4 h-4 inline mr-1"></i>URL
+                        </button>
+                        <button class="tab-btn-scanner flex-1 py-3 px-4 text-sm font-medium text-surface-400 hover:text-white" data-tab="image">
+                            <i data-lucide="image" class="w-4 h-4 inline mr-1"></i>Screenshot
+                        </button>
+                    </div>
+
+                    <!-- Tab Content -->
+                    <div class="p-6">
+                        <!-- Text Tab -->
+                        <div class="tab-panel-scanner active" id="panel-text">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-surface-300 mb-1">Job Title *</label>
+                                    <input type="text" placeholder="e.g., Senior Software Engineer" class="input-field">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-surface-300 mb-1">Company Name *</label>
+                                    <input type="text" placeholder="e.g., Google, TCS, StartupXYZ" class="input-field">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-surface-300 mb-1">Job Description *</label>
+                                    <textarea rows="4" placeholder="Paste the full job description here..." class="input-field font-mono text-sm"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- URL Tab -->
+                        <div class="tab-panel-scanner" id="panel-url">
+                            <div>
+                                <label class="block text-sm font-medium text-surface-300 mb-1">Job Posting URL *</label>
+                                <div class="flex gap-2">
+                                    <input type="url" placeholder="https://linkedin.com/jobs/view/... or https://naukri.com/..." class="input-field flex-1">
+                                    <button class="btn-primary px-4">Extract</button>
+                                </div>
+                                <p class="text-xs text-surface-500 mt-1">Supported: LinkedIn, Naukri, Indeed, Glassdoor, company careers pages</p>
+                            </div>
+                        </div>
+
+                        <!-- Image Tab -->
+                        <div class="tab-panel-scanner" id="panel-image">
+                            <div class="border-2 border-dashed border-card-border rounded-xl p-8 text-center hover:border-emerald-500/50 transition-colors">
+                                <i data-lucide="upload" class="w-12 h-12 text-surface-400 mx-auto mb-3"></i>
+                                <p class="text-surface-300 mb-1">Drag & drop a screenshot</p>
+                                <p class="text-sm text-surface-500 mb-4">or click to browse (PNG, JPG up to 10MB)</p>
+                                <button class="btn-secondary">Choose File</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Scan Button -->
+                    <div class="px-6 py-4 border-t border-card-border bg-surface-100/30">
+                        <button class="btn-primary w-full justify-center group" id="hero-scan-btn">
+                            <span class="htmx-indicator:hidden flex items-center gap-2">
+                                <i data-lucide="search" class="w-5 h-5"></i>
+                                Scan Job Posting
+                            </span>
+                            <span class="htmx-indicator flex items-center gap-2">
+                                <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                Analyzing...
+                            </span>
+                        </button>
+                        <p class="text-center text-xs text-surface-500 mt-3">
+                            Analyzed securely over an encrypted connection — we never contact the employer
+                        </p>
+                    </div>
+                </div>
             </div>
 
-            <!-- Tab Content -->
-            <div id="tab-content" class="p-6">
-                {% include "partials/tab_text.html" %}
+            <!-- Privacy Info -->
+            <div class="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-surface-500 animate-fade-in" style="animation-delay: 400ms;">
+                <span class="flex items-center gap-1.5"><i data-lucide="lock" class="w-4 h-4"></i>Encrypted</span>
+                <span class="flex items-center gap-1.5"><i data-lucide="eye-off" class="w-4 h-4"></i>Anonymous</span>
+                <span class="flex items-center gap-1.5"><i data-lucide="shield" class="w-4 h-4"></i>No employer contact</span>
+                <span class="flex items-center gap-1.5"><i data-lucide="database" class="w-4 h-4"></i>No data sold</span>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- How It Works -->
+<section id="features" class="py-20 px-4 bg-surface-100/30">
+    <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">How It Works</h2>
+            <p class="text-surface-300 text-lg max-w-2xl mx-auto">Three steps to verify any job posting</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6">
+            <!-- Step 1 -->
+            <div class="card p-6 card-hover animate-slide-up">
+                <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center mb-4">
+                    <i data-lucide="clipboard-paste" class="w-6 h-6 text-emerald-400"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-white mb-2">1. Paste the Job</h3>
+                <p class="text-surface-400 leading-relaxed">Copy any job description, link, or recruiter message. Upload a screenshot. Our AI extracts key details automatically.</p>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="card p-6 card-hover animate-slide-up" style="animation-delay: 100ms;">
+                <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center mb-4">
+                    <i data-lucide="cpu" class="w-6 h-6 text-emerald-400"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-white mb-2">2. AI Verifies</h3>
+                <p class="text-surface-400 leading-relaxed">8 detection layers analyze company authenticity, recruiter identity, salary realism, domain intelligence, and known scam patterns.</p>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="card p-6 card-hover animate-slide-up" style="animation-delay: 200ms;">
+                <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center mb-4">
+                    <i data-lucide="file-check" class="w-6 h-6 text-emerald-400"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-white mb-2">3. Get Your Verdict</h3>
+                <p class="text-surface-400 leading-relaxed">Instant 0–100 score with Safe/Caution/Risky verdict. Detailed evidence breakdown. Actionable next steps to protect yourself.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sample Results -->
+<section id="sample-results" class="py-20 px-4">
+    <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">Sample Results</h2>
+            <p class="text-surface-300 text-lg max-w-2xl mx-auto">What your analysis looks like</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6">
+            <!-- Safe Sample -->
+            <div class="card p-6 relative overflow-hidden animate-slide-up">
+                <div class="absolute top-4 right-4 w-20 h-20 bg-emerald-500/10 rounded-full blur-xl"></div>
+                <div class="relative flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                        <i data-lucide="shield-check" class="w-5 h-5 text-emerald-400"></i>
+                    </div>
+                    <div>
+                        <span class="px-3 py-1 text-xs font-semibold bg-emerald-500/10 text-emerald-400 rounded-full">SAFE</span>
+                        <p class="text-xs text-surface-500 mt-0.5">Legitimacy Score: 92/100</p>
+                    </div>
+                </div>
+                <h4 class="font-semibold text-white mb-1">Senior Software Engineer</h4>
+                <p class="text-surface-400 text-sm mb-4">Google • Mountain View, CA</p>
+                <div class="space-y-2 mb-4 border-t border-card-border pt-4">
+                    <div class="flex items-center gap-2 text-sm">
+                        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+                        <span class="text-surface-300">Company verified on careers.google.com</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-sm">
+                        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+                        <span class="text-surface-300">Recruiter uses @google.com email</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-sm">
+                        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+                        <span class="text-surface-300">Salary matches market benchmarks</span>
+                    </div>
+                </div>
+                <button class="btn-ghost w-full text-sm">View Full Report</button>
+            </div>
+
+            <!-- Caution Sample -->
+            <div class="card p-6 relative overflow-hidden animate-slide-up" style="animation-delay: 100ms;">
+                <div class="absolute top-4 right-4 w-20 h-20 bg-amber-500/10 rounded-full blur-xl"></div>
+                <div class="relative flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                        <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-400"></i>
+                    </div>
+                    <div>
+                        <span class="px-3 py-1 text-xs font-semibold bg-amber-500/10 text-amber-400 rounded-full">CAUTION</span>
+                        <p class="text-xs text-surface-500 mt-0.5">Legitimacy Score: 58/100</p>
+                    </div>
+                </div>
+                <h4 class="font-semibold text-white mb-1">Remote Data Entry Specialist</h4>
+                <p class="text-surface-400 text-sm mb-4">Global Data Solutions • Remote</p>
+                <div class="space-y-2 mb-4 border-t border-card-border pt-4">
+                    <div class="flex items-center gap-2 text-sm">
+                        <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-400"></i>
+                        <span class="text-surface-300">Company domain registered 14 days ago</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-sm">
+                        <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-400"></i>
+                        <span class="text-surface-300">Recruiter uses personal Gmail address</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-sm">
+                        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+                        <span class="text-surface-300">No upfront payment requests detected</span>
+                    </div>
+                </div>
+                <button class="btn-ghost w-full text-sm">View Full Report</button>
+            </div>
+
+            <!-- Risky Sample -->
+            <div class="card p-6 relative overflow-hidden animate-slide-up" style="animation-delay: 200ms;">
+                <div class="absolute top-4 right-4 w-20 h-20 bg-red-500/10 rounded-full blur-xl"></div>
+                <div class="relative flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center">
+                        <i data-lucide="x-circle" class="w-5 h-5 text-red-400"></i>
+                    </div>
+                    <div>
+                        <span class="px-3 py-1 text-xs font-semibold bg-red-500/10 text-red-400 rounded-full">RISKY</span>
+                        <p class="text-xs text-surface-500 mt-0.5">Legitimacy Score: 12/100</p>
+                    </div>
+                </div>
+                <h4 class="font-semibold text-white mb-1">Urgent: Data Entry Operator</h4>
+                <p class="text-surface-400 text-sm mb-4">QuickCash Global • Work from Home</p>
+                <div class="space-y-2 mb-4 border-t border-card-border pt-4">
+                    <div class="flex items-center gap-2 text-sm">
+                        <i data-lucide="x-circle" class="w-4 h-4 text-red-400"></i>
+                        <span class="text-surface-300">Registration fee of ₹2,500 required</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-sm">
+                        <i data-lucide="x-circle" class="w-4 h-4 text-red-400"></i>
+                        <span class="text-surface-300">WhatsApp-only communication</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-sm">
+                        <i data-lucide="x-circle" class="w-4 h-4 text-red-400"></i>
+                        <span class="text-surface-300">Requests Aadhaar & bank details upfront</span>
+                    </div>
+                </div>
+                <button class="btn-ghost w-full text-sm">View Full Report</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Detection Architecture -->
+<section id="detection" class="py-20 px-4 bg-surface-100/30">
+    <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">8 Detection Layers</h2>
+            <p class="text-surface-300 text-lg max-w-2xl mx-auto">Every scan runs through our multi-layer verification engine</p>
+        </div>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {% set layers = [
+                ("Company Authentication", "building-2", "Verifies legal entity registration, domain ownership, and business legitimacy", "emerald"),
+                ("Careers Page Verification", "globe", "Cross-references posting with official company careers page listings", "emerald"),
+                ("Recruiter Identity", "user-check", "Validates recruiter email domain, LinkedIn presence, and company affiliation", "amber"),
+                ("Salary Benchmarking", "dollar-sign", "Compares offered compensation against industry and role-specific ranges", "amber"),
+                ("Scam Pattern Detection", "alert-triangle", "ML detection of task scams, fee fraud, identity theft patterns", "red"),
+                ("Contact Validation", "phone", "Verifies phone numbers, email deliverability, and communication channels", "amber"),
+                ("Domain & SSL Intelligence", "lock", "Analyzes domain age, SSL certificates, hosting, and infrastructure", "emerald"),
+                ("Live Threat Intelligence", "activity", "Checks against real-time scam databases and community reports", "red"),
+            ] %}
+            {% for name, icon, desc, color in layers %}
+            <div class="card p-5 card-hover group">
+                <div class="w-10 h-10 rounded-lg bg-{{color}}-500/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <i data-lucide="{{icon}}" class="w-5 h-5 text-{{color}}-400"></i>
+                </div>
+                <h3 class="font-semibold text-white mb-2">{{name}}</h3>
+                <p class="text-surface-400 text-sm leading-relaxed">{{desc}}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Trust & Credibility -->
+<section id="trust" class="py-20 px-4">
+    <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">Trusted by Security Experts</h2>
+            <p class="text-surface-300 text-lg max-w-2xl mx-auto">Our detection methodology aligns with official guidelines</p>
+        </div>
+
+        <div class="grid md:grid-cols-4 gap-6 mb-16">
+            <div class="card p-6 text-center card-hover">
+                <i data-lucide="shield" class="w-12 h-12 text-emerald-400 mx-auto mb-4"></i>
+                <h3 class="font-semibold text-white mb-2">FTC Guidelines</h3>
+                <p class="text-surface-400 text-sm">Aligned with Federal Trade Commission job scam prevention guidelines</p>
+            </div>
+            <div class="card p-6 text-center card-hover">
+                <i data-lucide="badge-check" class="w-12 h-12 text-emerald-400 mx-auto mb-4"></i>
+                <h3 class="font-semibold text-white mb-2">BBB Scam Tracker</h3>
+                <p class="text-surface-400 text-sm">Patterns sourced from Better Business Bureau scam reports</p>
+            </div>
+            <div class="card p-6 text-center card-hover">
+                <i data-lucide="file-badge" class="w-12 h-12 text-emerald-400 mx-auto mb-4"></i>
+                <h3 class="font-semibold text-white mb-2">FBI IC3 Reports</h3>
+                <p class="text-surface-400 text-sm">Incorporates Internet Crime Complaint Center threat intelligence</p>
+            </div>
+            <div class="card p-6 text-center card-hover">
+                <i data-lucide="lock" class="w-12 h-12 text-emerald-400 mx-auto mb-4"></i>
+                <h3 class="font-semibold text-white mb-2">Privacy First</h3>
+                <p class="text-surface-400 text-sm">Encrypted analysis, no employer contact, no data sold</p>
             </div>
         </div>
 
-        <!-- Trust Signals -->
-        <div class="mt-8 text-center">
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Trusted by job seekers • Powered by open data</p>
-            <div class="flex flex-wrap items-center justify-center gap-6 text-xs text-gray-400 dark:text-gray-500">
-                <span class="flex items-center gap-1"><i data-lucide="database" class="w-3 h-3"></i>Kaggle FJDC Dataset</span>
-                <span class="flex items-center gap-1"><i data-lucide="shield" class="w-3 h-3"></i>FTC/BBB/IC3 Patterns</span>
-                <span class="flex items-center gap-1"><i data-lucide="globe" class="w-3 h-3"></i>India-Specific Scam Patterns</span>
+        <div class="grid md:grid-cols-3 gap-6">
+            <div class="card p-6 card-hover">
+                <h3 class="font-semibold text-white mb-4 flex items-center gap-2">
+                    <i data-lucide="check-circle" class="w-5 h-5 text-emerald-400"></i>
+                    Evidence-Based Verdicts
+                </h3>
+                <p class="text-surface-400 text-sm leading-relaxed">Every score comes with cited evidence. No black-box decisions — you see exactly what triggered each check.</p>
+            </div>
+            <div class="card p-6 card-hover">
+                <h3 class="font-semibold text-white mb-4 flex items-center gap-2">
+                    <i data-lucide="check-circle" class="w-5 h-5 text-emerald-400"></i>
+                    Continuously Updated
+                </h3>
+                <p class="text-surface-400 text-sm leading-relaxed">Detection patterns refresh weekly from live threat feeds, new scam reports, and community submissions.</p>
+            </div>
+            <div class="card p-6 card-hover">
+                <h3 class="font-semibold text-white mb-4 flex items-center gap-2">
+                    <i data-lucide="check-circle" class="w-5 h-5 text-emerald-400"></i>
+                    Transparent Methodology
+                </h3>
+                <p class="text-surface-400 text-sm leading-relaxed">Open about our 8 detection layers, training data sources, and model limitations. No hidden algorithms.</p>
             </div>
         </div>
-    </main>
-</div>
+    </div>
+</section>
 
-<!-- Result Modal/Section (HTMX target) -->
-<div id="result-container" class="mt-6"></div>
+<!-- Red Flags Guide -->
+<section id="red-flags" class="py-20 px-4 bg-surface-100/30">
+    <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">Job Scam Education</h2>
+            <p class="text-surface-300 text-lg max-w-2xl mx-auto">Learn the warning signs before you apply</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
+            {% set flags = [
+                ("Upfront Payment", "Any request for registration, training, or processing fees", "red"),
+                ("Personal Info Requests", "Aadhaar, PAN, bank details, or SSN before offer letter", "red"),
+                ("Free Email Domains", "Recruiters using Gmail, Yahoo, Outlook instead of company email", "amber"),
+                ("WhatsApp/Telegram Only", "No official company email or phone — only chat apps", "amber"),
+                ("Urgency Pressure", "\"Immediate start\", \"limited slots\", \"reply within 2 hours\"", "amber"),
+                ("Too Good to Be True", "High salary for low-skill work, no experience required", "red"),
+                ("Vague Job Details", "Missing responsibilities, requirements, or company information", "amber"),
+                ("New Company Domain", "Domain registered recently, no web presence, generic template", "amber"),
+                ("Grammar & Formatting", "Excessive caps, poor formatting, generic templates", "amber"),
+            ] %}
+            {% for title, desc, color in flags %}
+            <div class="card p-4 border-l-4 border-{{color}}-500 card-hover">
+                <h4 class="font-semibold text-white mb-1 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-{{color}}-500"></span>
+                    {{title}}
+                </h4>
+                <p class="text-surface-400 text-sm">{{desc}}</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Types of Job Fraud -->
+        <div class="mb-12">
+            <h3 class="text-2xl font-bold text-white mb-6 text-center">Common Types of Job Fraud</h3>
+            <div class="grid md:grid-cols-3 gap-4">
+                {% set fraud_types = [
+                    ("Task Scams", "Click, like, subscribe, captcha, form-filling tasks. Pay to unlock earnings.", "red"),
+                    ("Advance Fee Fraud", "Registration fees, training costs, visa processing, equipment deposits.", "red"),
+                    ("Identity Theft", "Collect Aadhaar, PAN, bank details, passport for \"verification\".", "red"),
+                    ("Money Mule", "Receive and forward funds — unknowingly laundering money.", "red"),
+                    ("Reshipping Scam", "Receive packages, re-ship overseas — handling stolen goods.", "amber"),
+                    ("Fake Check Scam", "Sent check, asked to refund difference — check bounces later.", "amber"),
+                ] %}
+                {% for title, desc, color in fraud_types %}
+                <div class="card p-5 card-hover">
+                    <h4 class="font-semibold text-white mb-2 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-{{color}}-500"></span>
+                        {{title}}
+                    </h4>
+                    <p class="text-surface-400 text-sm">{{desc}}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Verified Scam Reports -->
+<section id="reports" class="py-20 px-4">
+    <div class="max-w-7xl mx-auto">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h2 class="text-3xl sm:text-4xl font-bold text-white mb-2">Verified Scam Reports</h2>
+                <p class="text-surface-300">Recently reported by the community</p>
+            </div>
+            <a href="#" class="btn-ghost text-sm">View All Reports</a>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {% set reports = [
+                ("Data Entry Operator", "QuickHire Solutions", "Task Scam", "2 hours ago", "red"),
+                ("Remote Customer Support", "Global Connect Inc", "Advance Fee", "5 hours ago", "red"),
+                ("Part-time Data Analyst", "DataFlow Analytics", "Identity Theft", "1 day ago", "amber"),
+                ("Social Media Manager", "BuzzMedia Agency", "Fake Check", "2 days ago", "amber"),
+                ("Entry Level Developer", "TechStart Labs", "Money Mule", "3 days ago", "red"),
+                ("Virtual Assistant", "AdminPro Services", "Reshipping", "4 days ago", "amber"),
+            ] %}
+            {% for title, company, type, time, color in reports %}
+            <div class="card p-4 card-hover">
+                <div class="flex items-start justify-between mb-3">
+                    <div>
+                        <h4 class="font-semibold text-white">{{title}}</h4>
+                        <p class="text-surface-400 text-sm">{{company}}</p>
+                    </div>
+                    <span class="px-2 py-1 text-xs font-medium bg-{{color}}-500/10 text-{{color}}-400 rounded">{{type}}</span>
+                </div>
+                <div class="flex items-center justify-between text-xs text-surface-500">
+                    <span>Reported {{time}}</span>
+                    <a href="#" class="text-emerald-400 hover:text-emerald-300">View Details</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Recently Scanned -->
+<section id="recent" class="py-20 px-4 bg-surface-100/30">
+    <div class="max-w-7xl mx-auto">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h2 class="text-3xl sm:text-4xl font-bold text-white mb-2">Recently Scanned</h2>
+                <p class="text-surface-300">Community scans (anonymized)</p>
+            </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {% set recent = [
+                ("Senior Python Developer", "TechCorp India", 94, "Safe", "emerald", "10 min ago"),
+                ("Marketing Intern", "GrowthStart", 67, "Caution", "amber", "25 min ago"),
+                ("Work from Home Typist", "EasyEarn Global", 18, "Risky", "red", "42 min ago"),
+                ("DevOps Engineer", "CloudScale Systems", 89, "Safe", "emerald", "1 hour ago"),
+                ("Data Entry Specialist", "QuickData Solutions", 34, "Risky", "red", "1 hour ago"),
+                ("Sales Representative", "PrimeSales Co", 72, "Caution", "amber", "2 hours ago"),
+            ] %}
+            {% for title, company, score, verdict, color, time in recent %}
+            <div class="card p-4 card-hover">
+                <div class="flex items-start justify-between mb-3">
+                    <div class="flex-1 pr-4">
+                        <h4 class="font-semibold text-white">{{title}}</h4>
+                        <p class="text-surface-400 text-sm">{{company}}</p>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-2xl font-bold text-{{color}}-400">{{score}}</div>
+                        <span class="px-2 py-0.5 text-xs font-medium bg-{{color}}-500/10 text-{{color}}-400 rounded">{{verdict}}</span>
+                    </div>
+                </div>
+                <div class="text-xs text-surface-500">Scanned {{time}}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Final CTA -->
+<section class="py-20 px-4 relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-surface-50 to-amber-500/5"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-emerald-500/10 via-transparent to-transparent"></div>
+    <div class="relative max-w-3xl mx-auto text-center">
+        <h2 class="text-3xl sm:text-4xl font-bold text-white mb-6">Ready to Verify That Job?</h2>
+        <p class="text-surface-300 text-lg mb-8 max-w-xl mx-auto">Join thousands of job seekers who scan before they apply. Free, anonymous, and instant.</p>
+        <a href="/scanner" class="btn-primary px-8 py-4 text-lg inline-flex items-center gap-2">
+            <i data-lucide="search" class="w-5 h-5"></i>
+            Scan a Job Posting Now
+        </a>
+        <p class="mt-4 text-sm text-surface-500">No account required • Encrypted analysis • No employer contact</p>
+    </div>
+</section>
 
 <script>
-    // Tab switching logic
+    // Mobile menu toggle
     document.addEventListener('DOMContentLoaded', () => {
-        const tabButtons = document.querySelectorAll('.tab-btn');
-        tabButtons.forEach(btn => {
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+        if (btn && menu) {
             btn.addEventListener('click', () => {
-                tabButtons.forEach(b => {
-                    b.classList.remove('text-primary-600', 'dark:text-primary-400', 'border-primary-600', 'dark:border-primary-400');
-                    b.classList.add('text-gray-500', 'dark:text-gray-400', 'border-transparent');
-                    b.setAttribute('aria-selected', 'false');
+                menu.classList.toggle('hidden');
+            });
+        }
+
+        // Scanner tab switching in hero
+        const tabBtns = document.querySelectorAll('.tab-btn-scanner');
+        const panels = document.querySelectorAll('.tab-panel-scanner');
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tab = btn.dataset.tab;
+                tabBtns.forEach(b => {
+                    b.classList.remove('border-emerald-500', 'bg-surface-100', 'text-white');
+                    b.classList.add('text-surface-400');
                 });
-                btn.classList.remove('text-gray-500', 'dark:text-gray-400', 'border-transparent');
-                btn.classList.add('text-primary-600', 'dark:text-primary-400', 'border-primary-600', 'dark:border-primary-400');
-                btn.setAttribute('aria-selected', 'true');
+                btn.classList.add('border-emerald-500', 'bg-surface-100', 'text-white');
+                btn.classList.remove('text-surface-400');
+                panels.forEach(p => {
+                    p.classList.remove('active');
+                    if (p.id === 'panel-' + tab) p.classList.add('active');
+                });
             });
         });
+
+        // Hero scan button - redirect to scanner page
+        const scanBtn = document.getElementById('hero-scan-btn');
+        if (scanBtn) {
+            scanBtn.addEventListener('click', () => {
+                window.location.href = '/scanner';
+            });
+        }
     });
 </script>
 {% endblock %}
