@@ -9,10 +9,10 @@ venv/
 dist/
 build/
 
-# Model artifacts (use Git LFS or download at startup)
-app/model/artifacts/*.pkl
-app/model/artifacts/*.joblib
-app/model/artifacts/*.json
+# Model artifacts (small enough to commit, ~2.2MB total)
+# app/model/artifacts/*.pkl
+# app/model/artifacts/*.joblib
+# app/model/artifacts/*.json
 
 # Data
 data/raw/

@@ -1,0 +1,13 @@
+{
+  "accuracy": 0.9810264385692068,
+  "precision": 0.8429752066115702,
+  "recall": 0.7083333333333334,
+  "f1": 0.769811320754717,
+  "roc_auc": 0.982658109917146,
+  "train_samples": 12857,
+  "test_samples": 3215,
+  "fraud_ratio_train": 0.044722719141323794,
+  "fraud_ratio_test": 0.0447900466562986,
+  "scale_pos_weight": 21.36,
+  "model_version": "1.0.0"
+}
