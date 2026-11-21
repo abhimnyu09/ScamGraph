@@ -6,9 +6,9 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters, C
 from telegram.constants import ParseMode
 
 from app.model.predict import predict_risk, load_model
-from app.scrapers.linkedin import extract_linkedin_job_sync
-from app.scrapers.naukri import extract_naukri_job_sync
-from app.scrapers.generic import extract_generic_job_sync
+from app.scrapers.linkedin import extract_linkedin_job
+from app.scrapers.naukri import extract_naukri_job
+from app.scrapers.generic import extract_generic_job
 
 # --- Config ---
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -60,7 +60,7 @@ def format_result(result) -> str:
             "fail": "❌",
             "warning": "⚠️",
             "info": "ℹ️"
-        }.get(check.status, "❓")
+        }.get(check.check_status, "❓")
         lines.append(f"  {status_emoji} {check.name}: {check.message}")
 
     lines.append("")
@@ -106,11 +106,11 @@ async def analyze_url(url: str) -> str:
 
     # Try appropriate scraper
     if 'linkedin.com' in url_lower:
-        job_data = extract_linkedin_job_sync(url)
+        job_data = await extract_linkedin_job(url)
     elif 'naukri.com' in url_lower:
-        job_data = extract_naukri_job_sync(url)
+        job_data = await extract_naukri_job(url)
     else:
-        job_data = extract_generic_job_sync(url)
+        job_data = await extract_generic_job(url)
 
     if not job_data.get('success'):
         return f"❌ Could not extract job details from URL: {job_data.get('error', 'Unknown error')}"
