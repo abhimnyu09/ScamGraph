@@ -25,7 +25,7 @@
                 <a href="#features" class="text-text-secondary hover:text-text-primary text-sm font-medium transition-colors">Features</a>
                 <a href="#red-flags" class="text-text-secondary hover:text-text-primary text-sm font-medium transition-colors">Red Flags</a>
                 <a href="/scanner" class="text-text-secondary hover:text-text-primary text-sm font-medium transition-colors">Scanner</a>
-                <a href="/dashboard" class="btn-ghost px-4 py-2 text-sm">Sign In</a>
+                <a href="/login?next=/dashboard" class="btn-ghost px-4 py-2 text-sm">Sign In</a>
                 <a href="/scanner" class="btn-primary px-5 py-2 text-sm">Get Started</a>
             </div>
 
@@ -42,11 +42,13 @@
             <a href="#features" class="block px-3 py-2 text-text-secondary hover:text-text-primary hover:bg-surface-tertiary rounded-lg text-sm font-medium">Features</a>
             <a href="#red-flags" class="block px-3 py-2 text-text-secondary hover:text-text-primary hover:bg-surface-tertiary rounded-lg text-sm font-medium">Red Flags</a>
             <a href="/scanner" class="block px-3 py-2 text-text-secondary hover:text-text-primary hover:bg-surface-tertiary rounded-lg text-sm font-medium">Scanner</a>
-            <a href="/dashboard" class="block px-3 py-2 text-text-secondary hover:text-text-primary hover:bg-surface-tertiary rounded-lg text-sm font-medium">Sign In</a>
+            <a href="/login?next=/dashboard" class="block px-3 py-2 text-text-secondary hover:text-text-primary hover:bg-surface-tertiary rounded-lg text-sm font-medium">Sign In</a>
             <a href="/scanner" class="btn-primary w-full justify-center mt-2">Get Started</a>
         </div>
     </div>
 </nav>
+
+<main id="main-content" class="min-h-screen">
 
 <!-- Hero Section -->
 <header class="relative pt-32 pb-20 px-4 overflow-hidden">
@@ -77,17 +79,17 @@
 
             <!-- Trust Stats -->
             <div class="flex flex-wrap items-center justify-center gap-6 sm:gap-10 mb-10 animate-slide-up" style="animation-delay: 200ms;">
-                <div class="text-center">
+                <div class="text-center flex-1 min-w-[100px]">
                     <div class="text-3xl sm:text-4xl font-bold gradient-emerald">18K+</div>
                     <div class="text-sm text-text-muted mt-1">Training Samples</div>
                 </div>
-                <div class="w-px h-8 bg-surface-border mx-2"></div>
-                <div class="text-center">
+                <div class="hidden sm:block w-px h-8 bg-surface-border mx-2"></div>
+                <div class="text-center flex-1 min-w-[100px]">
                     <div class="text-3xl sm:text-4xl font-bold gradient-emerald">8</div>
                     <div class="text-sm text-text-muted mt-1">Detection Layers</div>
                 </div>
-                <div class="w-px h-8 bg-surface-border mx-2"></div>
-                <div class="text-center">
+                <div class="hidden sm:block w-px h-8 bg-surface-border mx-2"></div>
+                <div class="text-center flex-1 min-w-[100px]">
                     <div class="text-3xl sm:text-4xl font-bold gradient-emerald">< 60s</div>
                     <div class="text-sm text-text-muted mt-1">Avg Scan Time</div>
                 </div>
@@ -97,76 +99,121 @@
             <div class="relative animate-slide-up" style="animation-delay: 300ms;">
                 <div class="bg-surface-card border border-surface-border rounded-2xl overflow-hidden shadow-card max-w-3xl mx-auto">
                     <!-- Scanner Tabs -->
-                    <div class="flex border-b border-surface-border bg-bg-secondary">
-                        <button class="tab-btn-scanner flex-1 py-3 px-4 text-sm font-medium text-text-primary border-b-2 border-brand-emerald bg-surface-tertiary" data-tab="text">
-                            <i data-lucide="file-text" class="w-4 h-4 inline mr-1"></i>Text
+                    <div class="flex border-b border-surface-border bg-bg-secondary" role="tablist">
+                        <button role="tab" aria-selected="true" aria-controls="panel-text" class="tab-btn-scanner flex-1 py-3 px-4 md:py-3 md:px-4 text-sm font-medium text-text-primary border-b-2 border-brand-emerald bg-surface-tertiary flex items-center justify-center gap-2 min-h-[44px]" data-tab="text">
+                            <i data-lucide="file-text" class="w-4 h-4"></i><span>Text</span>
                         </button>
-                        <button class="tab-btn-scanner flex-1 py-3 px-4 text-sm font-medium text-text-muted hover:text-text-secondary" data-tab="url">
-                            <i data-lucide="link" class="w-4 h-4 inline mr-1"></i>URL
+                        <button role="tab" aria-selected="false" aria-controls="panel-url" class="tab-btn-scanner flex-1 py-3 px-4 md:py-3 md:px-4 text-sm font-medium text-text-muted hover:text-text-secondary flex items-center justify-center gap-2 min-h-[44px]" data-tab="url">
+                            <i data-lucide="link" class="w-4 h-4"></i><span>URL</span>
                         </button>
-                        <button class="tab-btn-scanner flex-1 py-3 px-4 text-sm font-medium text-text-muted hover:text-text-secondary" data-tab="image">
-                            <i data-lucide="image" class="w-4 h-4 inline mr-1"></i>Screenshot
+                        <button role="tab" aria-selected="false" aria-controls="panel-image" class="tab-btn-scanner flex-1 py-3 px-4 md:py-3 md:px-4 text-sm font-medium text-text-muted hover:text-text-secondary flex items-center justify-center gap-2 min-h-[44px]" data-tab="image">
+                            <i data-lucide="image" class="w-4 h-4"></i><span>Screenshot</span>
                         </button>
                     </div>
 
                     <!-- Tab Content -->
-                    <div class="p-6">
+                    <div class="p-4 sm:p-6">
                         <!-- Text Tab -->
-                        <div class="tab-panel-scanner active" id="panel-text">
-                            <div class="space-y-4">
+                        <div class="tab-panel-scanner active" id="panel-text" role="tabpanel" aria-labelledby="tab-text">
+                            <form hx-post="/analyze" hx-target="#result-container" hx-swap="innerHTML" hx-indicator="#hero-submit-spinner" class="space-y-4" id="hero-text-form">
                                 <div>
-                                    <label class="block text-sm font-medium text-text-secondary mb-1">Job Title *</label>
-                                    <input type="text" placeholder="e.g., Senior Software Engineer" class="input-field">
+                                    <label for="hero-job_title" class="block text-sm font-medium text-text-secondary mb-1">Job Title <span class="text-brand-red">*</span></label>
+                                    <input type="text" name="job_title" id="hero-job_title" required placeholder="e.g., Senior Software Engineer" class="input-field" maxlength="200">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-text-secondary mb-1">Company Name *</label>
-                                    <input type="text" placeholder="e.g., Google, TCS, StartupXYZ" class="input-field">
+                                    <label for="hero-company_name" class="block text-sm font-medium text-text-secondary mb-1">Company Name <span class="text-brand-red">*</span></label>
+                                    <input type="text" name="company_name" id="hero-company_name" required placeholder="e.g., Google, TCS, StartupXYZ" class="input-field" maxlength="200">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-text-secondary mb-1">Job Description *</label>
-                                    <textarea rows="4" placeholder="Paste the full job description here..." class="input-field font-mono text-sm"></textarea>
+                                    <label for="hero-job_description" class="block text-sm font-medium text-text-secondary mb-1">Job Description <span class="text-brand-red">*</span></label>
+                                    <textarea name="job_description" id="hero-job_description" required rows="4" placeholder="Paste the full job description here..." class="input-field font-mono text-sm" maxlength="20000"></textarea>
                                 </div>
-                            </div>
+
+                                <!-- Submit Button (inside form for HTMX compatibility) -->
+                                <div class="pt-4 border-t border-surface-border bg-bg-secondary/50">
+                                    <button type="submit" class="btn-primary w-full justify-center group" id="hero-submit-spinner">
+                                        <span class="htmx-indicator:hidden flex items-center gap-2">
+                                            <i data-lucide="search" class="w-5 h-5"></i>Scan Job Posting
+                                        </span>
+                                        <span class="htmx-indicator flex items-center gap-2">
+                                            <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                            Analyzing...
+                                        </span>
+                                    </button>
+                                    <p class="text-center text-xs text-text-muted mt-3">Analyzed securely over an encrypted connection — we never contact the employer</p>
+                                </div>
+                            </form>
                         </div>
 
                         <!-- URL Tab -->
-                        <div class="tab-panel-scanner" id="panel-url">
-                            <div>
-                                <label class="block text-sm font-medium text-text-secondary mb-1">Job Posting URL *</label>
-                                <div class="flex gap-2">
-                                    <input type="url" placeholder="https://linkedin.com/jobs/view/... or https://naukri.com/..." class="input-field flex-1">
-                                    <button class="btn-primary px-4">Extract</button>
+                        <div class="tab-panel-scanner" id="panel-url" role="tabpanel" aria-labelledby="tab-url">
+                            <form hx-post="/extract-url" hx-target="#hero-url-result" hx-swap="innerHTML" hx-indicator="#hero-url-spinner" class="space-y-4" id="hero-url-form">
+                                <div>
+                                    <label for="hero-url" class="block text-sm font-medium text-text-secondary mb-1">Job Posting URL <span class="text-brand-red">*</span></label>
+                                    <div class="flex gap-2">
+                                        <input type="url" name="url" id="hero-url" required placeholder="https://linkedin.com/jobs/view/... or https://naukri.com/..." class="input-field flex-1" maxlength="500">
+                                        <button type="submit" class="btn-primary px-4 flex items-center gap-2" id="hero-url-spinner">
+                                            <span class="htmx-indicator">
+                                                <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                            </span>
+                                            <span class="htmx-indicator:hidden">Extract</span>
+                                        </button>
+                                    </div>
+                                    <p class="text-xs text-text-muted mt-1">Supported: LinkedIn, Naukri, Indeed, Glassdoor, company careers pages</p>
                                 </div>
-                                <p class="text-xs text-text-muted mt-1">Supported: LinkedIn, Naukri, Indeed, Glassdoor, company careers pages</p>
-                            </div>
+                                <div id="hero-url-result"></div>
+                                <div id="hero-prefilled-form-container" class="hidden"></div>
+                            </form>
                         </div>
 
                         <!-- Image Tab -->
-                        <div class="tab-panel-scanner" id="panel-image">
-                            <div class="border-2 border-dashed border-surface-border rounded-xl p-8 text-center hover:border-brand-emerald/50 transition-colors bg-bg-secondary">
-                                <i data-lucide="upload" class="w-12 h-12 text-text-muted mx-auto mb-3"></i>
-                                <p class="text-text-secondary mb-1">Drag & drop a screenshot</p>
-                                <p class="text-sm text-text-muted mb-4">or click to browse (PNG, JPG up to 10MB)</p>
-                                <button class="btn-secondary">Choose File</button>
-                            </div>
+                        <div class="tab-panel-scanner" id="panel-image" role="tabpanel" aria-labelledby="tab-image">
+                            <form hx-post="/analyze/image" hx-target="#result-container" hx-swap="innerHTML" hx-indicator="#hero-image-spinner" class="space-y-4" id="hero-image-form" enctype="multipart/form-data">
+                                <div class="relative">
+                                    <div class="border-2 border-dashed border-surface-border rounded-xl p-8 text-center hover:border-brand-emerald/50 transition-colors relative bg-bg-secondary" id="hero-drop-zone">
+                                        <input type="file" name="image" id="hero-image-input" accept="image/png,image/jpeg,image/jpg,image/webp" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" style="z-index: 10;" aria-label="Upload screenshot">
+                                        <i data-lucide="upload" class="w-12 h-12 text-text-muted mx-auto mb-3"></i>
+                                        <p class="text-text-secondary mb-1">Drag & drop a screenshot</p>
+                                        <p class="text-sm text-text-muted mb-4">or click to browse (PNG, JPG, WebP up to 10MB)</p>
+                                        <button type="button" class="btn-secondary" onclick="document.getElementById('hero-image-input').click()">
+                                            <i data-lucide="folder-open" class="w-4 h-4 mr-2"></i>Choose File
+                                        </button>
+                                    </div>
+                                    <div id="hero-image-preview" class="hidden">
+                                        <div class="relative max-w-md mx-auto">
+                                            <img id="hero-preview-img" src="" alt="Screenshot preview" class="rounded-xl border border-surface-border w-full">
+                                            <button type="button" onclick="clearHeroImagePreview()" class="absolute top-2 right-2 w-8 h-8 rounded-full bg-brand-red/80 hover:bg-brand-red text-white flex items-center justify-center" aria-label="Remove image">
+                                                <i data-lucide="x" class="w-4 h-4"></i>
+                                            </button>
+                                        </div>
+                                        <p class="text-center text-sm text-text-secondary mt-2">Screenshot ready for analysis</p>
+                                    </div>
+                                </div>
+                                <div id="hero-ocr-loading" class="hidden flex items-center justify-center gap-3 p-4 bg-brand-amberLight border border-brand-amber/30 rounded-xl">
+                                    <svg class="animate-spin h-5 w-5 text-brand-amber" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                    <span class="text-sm text-text-secondary">Extracting text from image...</span>
+                                </div>
+                                <button type="submit" class="btn-primary w-full max-w-md justify-center group mx-auto" id="hero-image-spinner" disabled>
+                                    <span class="htmx-indicator:hidden flex items-center gap-2">
+                                        <i data-lucide="search" class="w-5 h-5"></i>Scan Screenshot
+                                    </span>
+                                    <span class="htmx-indicator flex items-center gap-2">
+                                        <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                        Analyzing...
+                                    </span>
+                                </button>
+                                <p class="text-center text-xs text-text-muted">OCR extraction runs locally — image never leaves your device</p>
+                            </form>
                         </div>
                     </div>
 
-                    <!-- Scan Button -->
-                    <div class="px-6 py-4 border-t border-surface-border bg-bg-secondary/50">
-                        <button class="btn-primary w-full justify-center group" id="hero-scan-btn">
-                            <span class="htmx-indicator:hidden flex items-center gap-2">
-                                <i data-lucide="search" class="w-5 h-5"></i>
-                                Scan Job Posting
-                            </span>
-                            <span class="htmx-indicator flex items-center gap-2">
-                                <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                Analyzing...
-                            </span>
-                        </button>
-                        <p class="text-center text-xs text-text-muted mt-3">
-                            Analyzed securely over an encrypted connection — we never contact the employer
-                        </p>
+                    <!-- Result Container -->
+                    <div id="result-container" class="px-6 pb-6">
+                        <div class="card p-8 text-center" id="empty-state">
+                            <i data-lucide="search" class="w-16 h-16 text-text-muted mx-auto mb-4"></i>
+                            <h3 class="text-lg font-semibold text-text-primary mb-2">No results yet</h3>
+                            <p class="text-text-secondary">Fill in the job details and click "Scan Job Posting" to see the analysis.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -578,15 +625,20 @@
         // Scanner tab switching in hero
         const tabBtns = document.querySelectorAll('.tab-btn-scanner');
         const panels = document.querySelectorAll('.tab-panel-scanner');
+
         tabBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 const tab = btn.dataset.tab;
+
                 tabBtns.forEach(b => {
                     b.classList.remove('border-brand-emerald', 'bg-surface-tertiary', 'text-text-primary');
                     b.classList.add('text-text-muted');
+                    b.setAttribute('aria-selected', 'false');
                 });
                 btn.classList.add('border-brand-emerald', 'bg-surface-tertiary', 'text-text-primary');
                 btn.classList.remove('text-text-muted');
+                btn.setAttribute('aria-selected', 'true');
+
                 panels.forEach(p => {
                     p.classList.remove('active');
                     if (p.id === 'panel-' + tab) p.classList.add('active');
@@ -594,13 +646,131 @@
             });
         });
 
-        // Hero scan button - redirect to scanner page
-        const scanBtn = document.getElementById('hero-scan-btn');
-        if (scanBtn) {
-            scanBtn.addEventListener('click', () => {
-                window.location.href = '/scanner';
+        // Keyboard navigation for tabs (Arrow keys)
+        tabBtns.forEach((btn, index) => {
+            btn.addEventListener('keydown', (e) => {
+                let newIndex = index;
+                if (e.key === 'ArrowRight') {
+                    newIndex = (index + 1) % tabBtns.length;
+                } else if (e.key === 'ArrowLeft') {
+                    newIndex = (index - 1 + tabBtns.length) % tabBtns.length;
+                } else if (e.key === 'Home') {
+                    newIndex = 0;
+                } else if (e.key === 'End') {
+                    newIndex = tabBtns.length - 1;
+                }
+                if (newIndex !== index) {
+                    e.preventDefault();
+                    tabBtns[newIndex].click();
+                    tabBtns[newIndex].focus();
+                }
             });
+        });
+
+        // Hero image preview handling
+        const heroImageInput = document.getElementById('hero-image-input');
+        const heroDropZone = document.getElementById('hero-drop-zone');
+        const heroImagePreview = document.getElementById('hero-image-preview');
+        const heroPreviewImg = document.getElementById('hero-preview-img');
+        const heroImageSubmitBtn = document.getElementById('hero-image-spinner');
+        const heroOcrLoading = document.getElementById('hero-ocr-loading');
+
+        if (heroImageInput) {
+            heroImageInput.addEventListener('change', handleHeroImageSelect);
         }
+
+        if (heroDropZone) {
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                heroDropZone.addEventListener(eventName, preventDefaults, false);
+            });
+            ['dragenter', 'dragover'].forEach(eventName => {
+                heroDropZone.addEventListener(eventName, highlight, false);
+            });
+            ['dragleave', 'drop'].forEach(eventName => {
+                heroDropZone.addEventListener(eventName, unhighlight, false);
+            });
+            heroDropZone.addEventListener('drop', handleHeroDrop, false);
+        }
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function highlight() {
+            heroDropZone.classList.add('border-brand-emerald', 'bg-brand-emeraldLight');
+        }
+
+        function unhighlight() {
+            heroDropZone.classList.remove('border-brand-emerald', 'bg-brand-emeraldLight');
+        }
+
+        function handleHeroDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length > 0) {
+                heroImageInput.files = files;
+                handleHeroImageSelect({ target: heroImageInput });
+            }
+        }
+
+        function handleHeroImageSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+            if (!validTypes.includes(file.type)) {
+                alert('Please select a valid image file (PNG, JPG, WebP)');
+                heroImageInput.value = '';
+                return;
+            }
+
+            if (file.size > 10 * 1024 * 1024) {
+                alert('File size must be less than 10MB');
+                heroImageInput.value = '';
+                return;
+            }
+
+            heroOcrLoading.classList.remove('hidden');
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                heroPreviewImg.src = e.target.result;
+                heroDropZone.classList.add('hidden');
+                heroImagePreview.classList.remove('hidden');
+                heroImageSubmitBtn.disabled = false;
+                heroOcrLoading.classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        window.clearHeroImagePreview = function() {
+            heroImageInput.value = '';
+            heroPreviewImg.src = '';
+            heroDropZone.classList.remove('hidden');
+            heroImagePreview.classList.add('hidden');
+            heroImageSubmitBtn.disabled = true;
+            heroOcrLoading.classList.add('hidden');
+        };
+
+        // HTMX events for result handling
+        document.body.addEventListener('htmx:afterSwap', (e) => {
+            if (e.detail.target.id === 'result-container') {
+                lucide.createIcons();
+                const emptyState = document.getElementById('empty-state');
+                if (emptyState) emptyState.style.display = 'none';
+            }
+            if (e.detail.target.id === 'hero-url-result') {
+                lucide.createIcons();
+                const container = document.getElementById('hero-prefilled-form-container');
+                if (container && container.innerHTML.trim()) {
+                    container.classList.remove('hidden');
+                    const textTab = document.querySelector('[data-tab="text"]');
+                    if (textTab) textTab.click();
+                }
+            }
+        });
     });
 </script>
+</main>
 {% endblock %}

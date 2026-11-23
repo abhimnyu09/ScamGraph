@@ -1,0 +1,155 @@
+<form hx-post="/analyze/image" hx-target="#result-container" hx-swap="innerHTML" hx-indicator="#image-spinner" class="space-y-6" id="image-form" enctype="multipart/form-data" data-mode="image">
+    <!-- Drop Zone -->
+    <div class="relative">
+        <div class="border-2 border-dashed border-surface-border rounded-xl p-10 text-center hover:border-brand-emerald/50 transition-colors relative bg-bg-secondary" id="drop-zone">
+            <input type="file" name="image" id="image-input" accept="image/png,image/jpeg,image/jpg,image/webp" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" style="z-index: 10;" aria-label="Upload screenshot">
+            <i data-lucide="upload" class="w-16 h-16 text-text-muted mx-auto mb-4"></i>
+            <p class="text-lg text-text-secondary mb-1">Drag & drop a screenshot</p>
+            <p class="text-sm text-text-muted mb-6">or click to browse (PNG, JPG, WebP up to 10MB)</p>
+            <button type="button" class="btn-secondary" onclick="document.getElementById('image-input').click()">
+                <i data-lucide="folder-open" class="w-5 h-5 mr-2"></i>
+                Choose File
+            </button>
+            <p class="mt-4 text-xs text-text-muted">Click or drag a file to upload</p>
+        </div>
+
+        <!-- Image Preview -->
+        <div id="image-preview" class="hidden">
+            <div class="relative max-w-md mx-auto">
+                <img id="preview-img" src="" alt="Screenshot preview" class="rounded-xl border border-surface-border w-full">
+                <button type="button" onclick="clearImagePreview()" class="absolute top-2 right-2 w-8 h-8 rounded-full bg-brand-red/80 hover:bg-brand-red text-white flex items-center justify-center" aria-label="Remove image">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <p class="text-center text-sm text-text-secondary mt-2">Screenshot ready for analysis</p>
+            <p class="text-center text-xs text-text-muted mt-1" id="ocr-status"></p>
+        </div>
+    </div>
+
+    <!-- OCR Status -->
+    <div id="ocr-loading" class="hidden flex items-center justify-center gap-3 p-4 bg-brand-amberLight border border-brand-amber/30 rounded-xl">
+        <svg class="animate-spin h-5 w-5 text-brand-amber" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+        <span class="text-sm text-text-secondary">Extracting text from image...</span>
+    </div>
+
+    <div class="flex items-center justify-center gap-4 pt-4 border-t border-surface-border">
+        <button type="submit" class="btn-primary w-full max-w-md justify-center group" id="image-spinner" disabled>
+            <span class="htmx-indicator:hidden flex items-center gap-2">
+                <i data-lucide="search" class="w-5 h-5"></i>
+                Scan Screenshot
+            </span>
+            <span class="htmx-indicator flex items-center gap-2">
+                <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                Analyzing...
+            </span>
+        </button>
+    </div>
+
+    <p class="text-center text-xs text-text-muted">
+        OCR extraction runs locally — image never leaves your device
+    </p>
+</form>
+
+<script>
+    // Image preview handling with OCR status
+    const imageInput = document.getElementById('image-input');
+    const dropZone = document.getElementById('drop-zone');
+    const imagePreview = document.getElementById('image-preview');
+    const previewImg = document.getElementById('preview-img');
+    const imageSubmitBtn = document.getElementById('image-spinner');
+    const ocrLoading = document.getElementById('ocr-loading');
+    const ocrStatus = document.getElementById('ocr-status');
+
+    if (imageInput) {
+        imageInput.addEventListener('change', handleImageSelect);
+    }
+
+    if (dropZone) {
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, unhighlight, false);
+        });
+
+        dropZone.addEventListener('drop', handleDrop, false);
+    }
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    function highlight() {
+        dropZone.classList.add('border-brand-emerald', 'bg-brand-emeraldLight');
+    }
+
+    function unhighlight() {
+        dropZone.classList.remove('border-brand-emerald', 'bg-brand-emeraldLight');
+    }
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files.length > 0) {
+            imageInput.files = files;
+            handleImageSelect({ target: imageInput });
+        }
+    }
+
+    function handleImageSelect(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Validate file type
+        const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+        if (!validTypes.includes(file.type)) {
+            alert('Please select a valid image file (PNG, JPG, WebP)');
+            imageInput.value = '';
+            return;
+        }
+
+        // Validate file size (10MB)
+        if (file.size > 10 * 1024 * 1024) {
+            alert('File size must be less than 10MB');
+            imageInput.value = '';
+            return;
+        }
+
+        // Show OCR loading state
+        ocrLoading.classList.remove('hidden');
+        ocrStatus.textContent = 'Preparing image...';
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            dropZone.classList.add('hidden');
+            imagePreview.classList.remove('hidden');
+            imageSubmitBtn.disabled = false;
+            ocrLoading.classList.add('hidden');
+            ocrStatus.textContent = 'Ready for analysis';
+        };
+        reader.onprogress = function(e) {
+            if (e.lengthComputable) {
+                const percent = Math.round((e.loaded / e.total) * 100);
+                ocrStatus.textContent = `Loading image... ${percent}%`;
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+
+    window.clearImagePreview = function() {
+        imageInput.value = '';
+        previewImg.src = '';
+        dropZone.classList.remove('hidden');
+        imagePreview.classList.add('hidden');
+        imageSubmitBtn.disabled = true;
+        ocrLoading.classList.add('hidden');
+        ocrStatus.textContent = '';
+    };
+</script>

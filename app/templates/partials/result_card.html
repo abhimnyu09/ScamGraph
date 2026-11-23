@@ -1,5 +1,17 @@
 <!-- Result Card -->
 <div class="animate-fade-in" id="result-card">
+    {% if result is none %}
+    <!-- Error State -->
+    <div class="card p-6 text-center">
+        <i data-lucide="alert-triangle" class="w-12 h-12 text-brand-amber mx-auto mb-4"></i>
+        <h3 class="text-lg font-semibold text-text-primary mb-2">Analysis Failed</h3>
+        <p class="text-text-secondary mb-4">{{ error or "An error occurred during analysis" }}</p>
+        <button type="button" onclick="document.getElementById('result-card').innerHTML=''" class="btn-ghost text-sm">
+            <i data-lucide="x" class="w-4 h-4 mr-1"></i>
+            Dismiss
+        </button>
+    </div>
+    {% else %}
     <!-- Score Header -->
     <div class="mb-6">
         <div class="flex items-center justify-between mb-4">
@@ -155,7 +167,19 @@
             <i data-lucide="printer" class="w-4 h-4"></i>
             Print / Save PDF
         </button>
+        {% if user %}
+        <a href="/dashboard/history" class="px-4 py-2 bg-brand-blue hover:bg-brand-blueHover text-white font-medium rounded-lg transition flex items-center gap-2">
+            <i data-lucide="history" class="w-4 h-4"></i>
+            View Full Analysis
+        </a>
+        {% else %}
+        <a href="/login?next=/dashboard/history" class="px-4 py-2 bg-brand-blue hover:bg-brand-blueHover text-white font-medium rounded-lg transition flex items-center gap-2">
+            <i data-lucide="log-in" class="w-4 h-4"></i>
+            Save & View Details
+        </a>
+        {% endif %}
     </div>
+    {% endif %}
 
     <!-- Disclaimer -->
     <p class="mt-6 text-xs text-text-muted text-center">

@@ -1,259 +1,156 @@
-{% extends "base.html" %}
+{% extends "app_base.html" %}
 
 {% block title %}Dashboard — ScamGraph{% endblock %}
 
-{% block content %}
-<!-- Navigation Bar -->
-<nav class="fixed top-0 left-0 right-0 z-50 bg-bg-secondary/80 backdrop-blur-md border-b border-surface-border">
-    <div class="max-w-7xl mx-auto px-4">
-        <div class="flex items-center justify-between h-16">
-            <a href="/" class="flex items-center gap-2" aria-label="ScamGraph Home">
-                <div class="w-8 h-8 rounded-lg bg-brand-emerald flex items-center justify-center">
-                    <i data-lucide="shield-check" class="w-5 h-5 text-white"></i>
+{% block app_content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div>
+            <h1 class="text-2xl sm:text-3xl font-bold text-text-primary">Dashboard</h1>
+            <p class="text-text-secondary mt-1">Welcome back, {{ user.name }}. Here's your scanning overview.</p>
+        </div>
+        <a href="/scanner" class="btn-primary justify-center gap-2 w-full sm:w-auto">
+            <i data-lucide="search" class="w-5 h-5"></i>
+            New Scan
+        </a>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="card p-5 card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-text-secondary">Total Scans</p>
+                    <p class="text-3xl font-bold text-text-primary mt-1">{{ stats.total }}</p>
                 </div>
-                <span class="font-bold text-xl text-text-primary">ScamGraph</span>
-            </a>
-            <div class="hidden md:flex items-center gap-4">
-                <a href="/scanner" class="btn-primary px-5 py-2 text-sm">
-                    <i data-lucide="search" class="w-4 h-4"></i>
-                    New Scan
-                </a>
-                <div class="relative group">
-                    <button class="btn-ghost px-4 py-2 flex items-center gap-2">
-                        <span class="text-sm font-medium text-text-primary">{{ user.name }}</span>
-                        <i data-lucide="chevron-down" class="w-4 h-4"></i>
-                    </button>
-                    <div class="absolute right-0 mt-2 w-48 bg-surface-card border border-surface-border rounded-xl shadow-card opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                        <a href="/dashboard/profile" class="block px-4 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-tertiary">Profile</a>
-                        <a href="/logout" class="block px-4 py-2 text-sm text-brand-red hover:text-red-400 hover:bg-surface-tertiary">Sign Out</a>
-                    </div>
+                <div class="w-12 h-12 rounded-xl bg-brand-emeraldLight flex items-center justify-center">
+                    <i data-lucide="search" class="w-6 h-6 text-brand-emerald"></i>
+                </div>
+            </div>
+        </div>
+        <div class="card p-5 card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-brand-emerald">Safe</p>
+                    <p class="text-3xl font-bold text-brand-emerald mt-1">{{ stats.safe }}</p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-brand-emeraldLight flex items-center justify-center">
+                    <i data-lucide="check-circle" class="w-6 h-6 text-brand-emerald"></i>
+                </div>
+            </div>
+        </div>
+        <div class="card p-5 card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-brand-amber">Caution</p>
+                    <p class="text-3xl font-bold text-brand-amber mt-1">{{ stats.caution }}</p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-brand-amberLight flex items-center justify-center">
+                    <i data-lucide="alert-triangle" class="w-6 h-6 text-brand-amber"></i>
+                </div>
+            </div>
+        </div>
+        <div class="card p-5 card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-brand-red">Risky</p>
+                    <p class="text-3xl font-bold text-brand-red mt-1">{{ stats.risky }}</p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-brand-redLight flex items-center justify-center">
+                    <i data-lucide="x-circle" class="w-6 h-6 text-brand-red"></i>
                 </div>
             </div>
         </div>
     </div>
-</nav>
 
-<!-- Dashboard Layout -->
-<div class="pt-20 min-h-screen">
-    <div class="max-w-7xl mx-auto px-4 pb-12">
-        <div class="flex flex-col lg:flex-row gap-6">
-            <!-- Sidebar -->
-            <aside class="lg:w-64 flex-shrink-0">
-                <div class="card p-4 sticky top-24">
-                    <!-- User Info -->
-                    <div class="flex items-center gap-3 mb-6 pb-4 border-b border-surface-border">
-                        <div class="w-10 h-10 rounded-lg bg-brand-emeraldLight flex items-center justify-center">
-                            <i data-lucide="user" class="w-5 h-5 text-brand-emerald"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="font-medium text-text-primary truncate">{{ user.name }}</p>
-                            <p class="text-xs text-text-muted truncate">{{ user.email }}</p>
-                        </div>
-                    </div>
-
-                    <!-- Navigation -->
-                    <nav class="space-y-1" aria-label="Dashboard navigation">
-                        <a href="/dashboard" class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-brand-emeraldLight text-brand-emerald font-medium">
-                            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                            Overview
-                        </a>
-                        <a href="/dashboard/history" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-tertiary transition-colors">
-                            <i data-lucide="history" class="w-5 h-5"></i>
-                            Scan History
-                        </a>
-                        <a href="/dashboard/report" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-tertiary transition-colors">
-                            <i data-lucide="flag" class="w-5 h-5"></i>
-                            Report Scam
-                        </a>
-                        <a href="/dashboard/profile" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-tertiary transition-colors">
-                            <i data-lucide="settings" class="w-5 h-5"></i>
-                            Settings
-                        </a>
-                    </nav>
-
-                    <!-- Quick Stats -->
-                    <div class="mt-6 pt-6 border-t border-surface-border space-y-3">
-                        <div class="flex items-center justify-between text-sm">
-                            <span class="text-text-secondary">Total Scans</span>
-                            <span class="font-semibold text-text-primary">{{ stats.total }}</span>
-                        </div>
-                        <div class="flex items-center justify-between text-sm">
-                            <span class="text-brand-emerald flex items-center gap-1">
-                                <i data-lucide="check-circle" class="w-3 h-3"></i>
-                                Safe
-                            </span>
-                            <span class="font-semibold text-brand-emerald">{{ stats.safe }}</span>
-                        </div>
-                        <div class="flex items-center justify-between text-sm">
-                            <span class="text-brand-amber flex items-center gap-1">
-                                <i data-lucide="alert-triangle" class="w-3 h-3"></i>
-                                Caution
-                            </span>
-                            <span class="font-semibold text-brand-amber">{{ stats.caution }}</span>
-                        </div>
-                        <div class="flex items-center justify-between text-sm">
-                            <span class="text-brand-red flex items-center gap-1">
-                                <i data-lucide="x-circle" class="w-3 h-3"></i>
-                                Risky
-                            </span>
-                            <span class="font-semibold text-brand-red">{{ stats.risky }}</span>
-                        </div>
-                    </div>
-                </div>
-            </aside>
-
-            <!-- Main Content -->
-            <main class="flex-1 min-w-0">
-                <!-- Header -->
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-                    <div>
-                        <h1 class="text-2xl font-bold text-text-primary">Dashboard</h1>
-                        <p class="text-text-secondary mt-1">Welcome back, {{ user.name }}. Here's your scanning overview.</p>
-                    </div>
-                    <a href="/scanner" class="btn-primary justify-center gap-2">
-                        <i data-lucide="search" class="w-5 h-5"></i>
-                        New Scan
-                    </a>
-                </div>
-
-                <!-- Stats Cards -->
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                    <div class="card p-5 card-hover">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm text-text-secondary">Total Scans</p>
-                                <p class="text-3xl font-bold text-text-primary mt-1">{{ stats.total }}</p>
-                            </div>
-                            <div class="w-12 h-12 rounded-xl bg-brand-emeraldLight flex items-center justify-center">
-                                <i data-lucide="search" class="w-6 h-6 text-brand-emerald"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card p-5 card-hover">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm text-brand-emerald">Safe</p>
-                                <p class="text-3xl font-bold text-brand-emerald mt-1">{{ stats.safe }}</p>
-                            </div>
-                            <div class="w-12 h-12 rounded-xl bg-brand-emeraldLight flex items-center justify-center">
-                                <i data-lucide="check-circle" class="w-6 h-6 text-brand-emerald"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card p-5 card-hover">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm text-brand-amber">Caution</p>
-                                <p class="text-3xl font-bold text-brand-amber mt-1">{{ stats.caution }}</p>
-                            </div>
-                            <div class="w-12 h-12 rounded-xl bg-brand-amberLight flex items-center justify-center">
-                                <i data-lucide="alert-triangle" class="w-6 h-6 text-brand-amber"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card p-5 card-hover">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm text-brand-red">Risky</p>
-                                <p class="text-3xl font-bold text-brand-red mt-1">{{ stats.risky }}</p>
-                            </div>
-                            <div class="w-12 h-12 rounded-xl bg-brand-redLight flex items-center justify-center">
-                                <i data-lucide="x-circle" class="w-6 h-6 text-brand-red"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recent Scans -->
-                <div class="card">
-                    <div class="p-5 border-b border-surface-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                        <h2 class="font-semibold text-text-primary">Recent Scans</h2>
-                        <a href="/dashboard/history" class="btn-ghost text-sm">View All</a>
-                    </div>
-
-                    {% if recent_scans %}
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead>
-                                <tr class="text-left text-sm text-text-muted border-b border-surface-border">
-                                    <th class="p-4 font-medium text-text-secondary">Job</th>
-                                    <th class="p-4 font-medium text-text-secondary">Company</th>
-                                    <th class="p-4 font-medium text-text-secondary hidden md:table-cell">Score</th>
-                                    <th class="p-4 font-medium text-text-secondary">Verdict</th>
-                                    <th class="p-4 font-medium text-text-secondary">Date</th>
-                                    <th class="p-4 font-medium text-text-secondary"></th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-surface-border">
-                                {% for scan in recent_scans %}
-                                <tr class="hover:bg-surface-tertiary/50 transition-colors">
-                                    <td class="p-4">
-                                        <div class="font-medium text-text-primary truncate max-w-xs">{{ scan.job_title }}</div>
-                                    </td>
-                                    <td class="p-4 text-text-secondary">{{ scan.company_name }}</td>
-                                    <td class="p-4 hidden md:table-cell">
-                                        <span class="font-mono font-semibold {% if scan.risk_score >= 70 %}text-brand-red{% elif scan.risk_score >= 40 %}text-brand-amber{% else %}text-brand-emerald{% endif %}">{{ scan.risk_score }}/100</span>
-                                    </td>
-                                    <td class="p-4">
-                                        <span class="px-2 py-1 text-xs font-medium rounded-full
-                                            {% if scan.risk_tier == 'safe' %}bg-brand-emeraldLight text-brand-emerald
-                                            {% elif scan.risk_tier == 'caution' %}bg-brand-amberLight text-brand-amber
-                                            {% else %}bg-brand-redLight text-brand-red{% endif %}">
-                                            {{ scan.risk_tier|upper }}
-                                        </span>
-                                    </td>
-                                    <td class="p-4 text-sm text-text-muted">
-                                        {{ scan.timestamp[:10] }}
-                                    </td>
-                                    <td class="p-4 text-right">
-                                        <a href="/dashboard/scan/{{ scan.id }}" class="btn-ghost p-2 text-sm">
-                                            <i data-lucide="eye" class="w-4 h-4"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    {% else %}
-                    <div class="p-12 text-center">
-                        <i data-lucide="search" class="w-16 h-16 text-text-muted mx-auto mb-4"></i>
-                        <h3 class="text-lg font-semibold text-text-primary mb-2">No scans yet</h3>
-                        <p class="text-text-secondary mb-6">Start by scanning your first job posting</p>
-                        <a href="/scanner" class="btn-primary justify-center gap-2 inline-flex">
-                            <i data-lucide="search" class="w-5 h-5"></i>
-                            Scan a Job
-                        </a>
-                    </div>
-                    {% endif %}
-                </div>
-
-                <!-- Quick Actions -->
-                <div class="mt-6 grid sm:grid-cols-3 gap-4">
-                    <a href="/scanner" class="card p-5 card-hover text-center">
-                        <i data-lucide="search" class="w-10 h-10 text-brand-emerald mx-auto mb-3"></i>
-                        <h3 class="font-semibold text-text-primary mb-1">Scan a Job</h3>
-                        <p class="text-sm text-text-secondary">Paste text, drop a URL, or upload a screenshot</p>
-                    </a>
-                    <a href="/dashboard/history" class="card p-5 card-hover text-center">
-                        <i data-lucide="history" class="w-10 h-10 text-brand-amber mx-auto mb-3"></i>
-                        <h3 class="font-semibold text-text-primary mb-1">View History</h3>
-                        <p class="text-sm text-text-secondary">Review all your past scans and export reports</p>
-                    </a>
-                    <a href="/dashboard/report" class="card p-5 card-hover text-center">
-                        <i data-lucide="flag" class="w-10 h-10 text-brand-red mx-auto mb-3"></i>
-                        <h3 class="font-semibold text-text-primary mb-1">Report a Scam</h3>
-                        <p class="text-sm text-text-secondary">Help protect others by reporting suspicious postings</p>
-                    </a>
-                </div>
-            </main>
+    <!-- Recent Scans -->
+    <div class="card">
+        <div class="p-5 border-b border-surface-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <h2 class="font-semibold text-text-primary">Recent Scans</h2>
+            <a href="/dashboard/history" class="btn-ghost text-sm w-full sm:w-auto">View All</a>
         </div>
+
+        {% if recent_scans %}
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="text-left text-sm text-text-muted border-b border-surface-border">
+                        <th class="p-4 font-medium text-text-secondary">Job</th>
+                        <th class="p-4 font-medium text-text-secondary">Company</th>
+                        <th class="p-4 font-medium text-text-secondary hidden md:table-cell">Score</th>
+                        <th class="p-4 font-medium text-text-secondary">Verdict</th>
+                        <th class="p-4 font-medium text-text-secondary">Date</th>
+                        <th class="p-4 font-medium text-text-secondary"></th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-surface-border">
+                    {% for scan in recent_scans %}
+                    <tr class="hover:bg-surface-tertiary/50 transition-colors">
+                        <td class="p-4">
+                            <div class="font-medium text-text-primary truncate max-w-xs">{{ scan.job_title }}</div>
+                        </td>
+                        <td class="p-4 text-text-secondary">{{ scan.company_name }}</td>
+                        <td class="p-4 hidden md:table-cell">
+                            <span class="font-mono font-semibold {% if scan.risk_score >= 70 %}text-brand-red{% elif scan.risk_score >= 40 %}text-brand-amber{% else %}text-brand-emerald{% endif %}">{{ scan.risk_score }}/100</span>
+                        </td>
+                        <td class="p-4">
+                            <span class="px-2 py-1 text-xs font-medium rounded-full
+                                {% if scan.risk_tier == 'safe' %}bg-brand-emeraldLight text-brand-emerald
+                                {% elif scan.risk_tier == 'caution' %}bg-brand-amberLight text-brand-amber
+                                {% else %}bg-brand-redLight text-brand-red{% endif %}">
+                                {{ scan.risk_tier|upper }}
+                            </span>
+                        </td>
+                        <td class="p-4 text-sm text-text-muted">
+                            {{ scan.timestamp[:10] }}
+                        </td>
+                        <td class="p-4 text-right">
+                            <a href="/dashboard/scan/{{ scan.id }}" class="btn-ghost p-2 text-sm" title="View Details">
+                                <i data-lucide="eye" class="w-4 h-4"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="p-12 text-center">
+            <i data-lucide="search" class="w-16 h-16 text-text-muted mx-auto mb-4"></i>
+            <h3 class="text-lg font-semibold text-text-primary mb-2">No scans yet</h3>
+            <p class="text-text-secondary mb-6">Start by scanning your first job posting</p>
+            <a href="/scanner" class="btn-primary justify-center gap-2 inline-flex">
+                <i data-lucide="search" class="w-5 h-5"></i>
+                Scan a Job
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="mt-8 grid sm:grid-cols-3 gap-4">
+        <a href="/scanner" class="card p-5 card-hover text-center">
+            <i data-lucide="search" class="w-10 h-10 text-brand-emerald mx-auto mb-3"></i>
+            <h3 class="font-semibold text-text-primary mb-1">Scan a Job</h3>
+            <p class="text-sm text-text-secondary">Paste text, drop a URL, or upload a screenshot</p>
+        </a>
+        <a href="/dashboard/history" class="card p-5 card-hover text-center">
+            <i data-lucide="history" class="w-10 h-10 text-brand-amber mx-auto mb-3"></i>
+            <h3 class="font-semibold text-text-primary mb-1">View History</h3>
+            <p class="text-sm text-text-secondary">Review all your past scans and export reports</p>
+        </a>
+        <a href="/dashboard/report" class="card p-5 card-hover text-center">
+            <i data-lucide="flag" class="w-10 h-10 text-brand-red mx-auto mb-3"></i>
+            <h3 class="font-semibold text-text-primary mb-1">Report a Scam</h3>
+            <p class="text-sm text-text-secondary">Help protect others by reporting suspicious postings</p>
+        </a>
     </div>
 </div>
-
 {% endblock %}
 
 {% block scripts %}
+{{ super() }}
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         if (window.lucide) lucide.createIcons();

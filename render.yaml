@@ -8,9 +8,13 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
-      - key: TELEGRAM_BOT_TOKEN
+      - key: SECRET_KEY
+        generateValue: true
+      - key: GOOGLE_CLIENT_ID
         sync: false
-      - key: WEBHOOK_URL
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
         sync: false
     autoDeploy: true
     healthCheckPath: /health
