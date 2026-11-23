@@ -290,7 +290,12 @@ def predict_risk(
     if physical_address_status is None:
         physical_address_status = check_physical_address(job_description, company_name)
     years_operation_status = ai_get_nested(cr, "years_in_operation") or check_years_operation(company_name, domain_age)
-    company_locations = ai_get_nested(cr, "company_locations") or extract_company_locations(job_description, company_name)
+    # company_locations from AI is a list, convert to string for schema
+    company_locations_raw = ai_get_nested(cr, "company_locations")
+    if isinstance(company_locations_raw, list):
+        company_locations = "; ".join(company_locations_raw)
+    else:
+        company_locations = company_locations_raw or extract_company_locations(job_description, company_name)
 
     # Location Verification
     job_location = ai_get_nested(lv, "job_location") or (location if location else extract_job_location(job_description))
