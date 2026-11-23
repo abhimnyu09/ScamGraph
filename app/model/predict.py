@@ -163,6 +163,67 @@ RULES:
         return json.loads(content)
     except Exception as e:
         print(f"AI research error: {e}")
+        # Retry with simpler prompt if JSON validation failed
+        if "json_validate_failed" in str(e) or "400" in str(e):
+            try:
+                simple_prompt = f"""Analyze this job posting. Return ONLY valid JSON with these fields:
+{{
+  "company_website": "official website URL or null",
+  "company_executive_summary": "2-3 paragraph company analysis or null",
+  "domain_age": integer or null,
+  "linkedin_company": "LinkedIn URL or null",
+  "glassdoor_company": "Glassdoor URL or null",
+  "company_registration_status": "registered|not_found|unknown",
+  "domain_ownership_status": "matches|mismatch|unknown",
+  "physical_address_status": "verified|not_verified|unknown",
+  "years_operation_status": "5+ years|unknown",
+  "company_locations": "city, state, country; city, state, country or null",
+  "job_location": "extracted from posting or null",
+  "work_type": "remote|hybrid|on_site",
+  "location_match_status": "pass|warning|fail|info",
+  "location_match_details": "explanation or null",
+  "location_analysis_notes": "detailed notes or null",
+  "recruiter_name": "name or null",
+  "email_domain_verified": true/false,
+  "recruiter_linkedin": "LinkedIn URL or null",
+  "linkedin_verified": "verified|not_found|unknown",
+  "directory_match": "found|not_found|unknown",
+  "official_channel": "pass|warning|fail",
+  "salary_text": "salary from posting or null",
+  "salary_benchmark": "Indian market range for role×city or null",
+  "responsibilities": "key responsibilities or null",
+  "requirements": "key requirements or null",
+  "salary_in_range": "pass|warning|fail|info",
+  "no_unrealistic_salary": "pass|warning|fail",
+  "clear_structure": "pass|warning|fail",
+  "job_structure_complete": "pass|warning|fail",
+  "grammar_errors": integer,
+  "spacing_issues": integer,
+  "suspicious_phrases": integer,
+  "urgency_language": integer,
+  "grammar_examples": ["example1", "example2"],
+  "content_assessment": "assessment or null",
+  "suspicious_signals": [{"type": "cat", "signal": "evidence", "severity": "critical|high|medium"}],
+  "legitimate_signals": [{"type": "cat", "signal": "evidence", "severity": "positive"}],
+  "final_recommendation": "recommendation or null",
+  "immediate_precautions": ["step1", "step2"],
+  "verification_steps": ["step1", "step2"]
+}}
+Job: {job_title} at {company_name}. Desc: {job_description[:1500]}. Salary: {salary_text}. Location: {location}. Risk: {risk_score}/100 ({risk_tier})"""
+                response = client.chat.completions.create(
+                    model="openai/gpt-oss-20b",
+                    messages=[
+                        {"role": "system", "content": "Return only valid JSON. No extra text."},
+                        {"role": "user", "content": simple_prompt}
+                    ],
+                    temperature=0.1,
+                    max_tokens=2500,
+                    response_format={"type": "json_object"}
+                )
+                content = response.choices[0].message.content
+                return json.loads(content)
+            except Exception as e2:
+                print(f"AI research retry error: {e2}")
         return {}
 
 

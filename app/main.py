@@ -157,6 +157,14 @@ def init_db():
     """)
 
     conn.commit()
+
+    # Migration: Add company_executive_summary column if not exists
+    cursor.execute("PRAGMA table_info(scan_history)")
+    columns = [row[1] for row in cursor.fetchall()]
+    if "company_executive_summary" not in columns:
+        cursor.execute("ALTER TABLE scan_history ADD COLUMN company_executive_summary TEXT")
+        conn.commit()
+
     conn.close()
 
 # Initialize database on startup
