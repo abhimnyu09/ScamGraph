@@ -2,6 +2,8 @@ import joblib
 import numpy as np
 import xgboost as xgb
 import re
+import json
+import os
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 from scipy.sparse import csr_matrix, hstack
@@ -9,6 +11,18 @@ from scipy.sparse import csr_matrix, hstack
 from app.features.text_features import extract_text_features, load_vectorizers
 from app.features.handcrafted import extract_handcrafted_features, get_feature_names
 from app.schemas import CheckResult, AnalysisResult
+
+# --- OpenAI Client (lazy init) ---
+_openai_client = None
+
+def get_openai_client():
+    global _openai_client
+    if _openai_client is None:
+        api_key = os.environ.get("OPENAI_API_KEY")
+        if api_key:
+            from openai import OpenAI
+            _openai_client = OpenAI(api_key=api_key)
+    return _openai_client
 
 
 # --- Paths ---
@@ -45,6 +59,109 @@ def get_model() -> xgb.XGBClassifier:
 
 def get_metrics() -> Dict[str, Any]:
     return _metrics
+
+
+# --- AI Research Agent (OpenAI) ---
+def enrich_with_ai_research(
+    job_title: str,
+    company_name: str,
+    job_description: str,
+    job_url: str,
+    recruiter_email: str,
+    recruiter_phone: str,
+    location: str,
+    salary_text: str,
+    risk_score: int,
+    risk_tier: str
+) -> Dict[str, Any]:
+    """
+    Use OpenAI to research company and enrich analysis with real data.
+    Returns dict with all detailed analysis fields.
+    """
+    client = get_openai_client()
+    if not client:
+        return {}  # No API key, fallback to stubs
+
+    # Build prompt
+    prompt = f"""You are a job posting verification expert. Research and analyze this job posting.
+
+JOB DATA:
+- Title: {job_title}
+- Company: {company_name}
+- Description: {job_description[:3000]}
+- URL: {job_url or 'Not provided'}
+- Recruiter Email: {recruiter_email or 'Not provided'}
+- Recruiter Phone: {recruiter_phone or 'Not provided'}
+- Location: {location or 'Not provided'}
+- Salary: {salary_text or 'Not provided'}
+- ML Risk Score: {risk_score}/100 ({risk_tier})
+
+Return ONLY valid JSON with these fields (use null if unknown):
+{{
+  "company_website": "official website URL or null",
+  "domain_age_days": integer or null,
+  "linkedin_company_url": "LinkedIn company page URL or search URL or null",
+  "glassdoor_company_url": "Glassdoor URL or search URL or null",
+  "company_registration_status": "registered|not_found|unknown",
+  "domain_ownership_match": "matches|mismatch|unknown",
+  "physical_address_verified": true/false/null,
+  "years_in_operation": integer or null,
+  "company_locations": "city, country list or null",
+  "job_location": "extracted from posting or null",
+  "work_type": "remote|hybrid|on_site",
+  "location_match_status": "pass|warning|fail|info",
+  "location_match_details": "explanation",
+  "location_analysis_notes": "detailed notes",
+  "recruiter_name": "extracted name or null",
+  "email_domain_verified": true/false,
+  "recruiter_linkedin_url": "LinkedIn profile URL or search URL or null",
+  "linkedin_verified": "verified|not_found|unknown",
+  "directory_match": "found|not_found|unknown",
+  "official_channel": "pass|warning|fail",
+  "salary_benchmark": "market salary range for this role in this location (e.g., '₹15-25 LPA for Backend Developer in Bangalore')",
+  "responsibilities": "extracted key responsibilities from description",
+  "requirements": "extracted key requirements from description",
+  "salary_in_range": "pass|warning|fail|info",
+  "no_unrealistic_salary": "pass|warning|fail",
+  "clear_structure": "pass|warning|fail",
+  "job_structure_complete": "pass|warning|fail",
+  "grammar_errors": integer,
+  "spacing_issues": integer,
+  "suspicious_phrases": integer,
+  "urgency_language": integer,
+  "grammar_examples": ["example1", "example2"],
+  "content_assessment": "overall content quality assessment",
+  "suspicious_signals": [{{"type": "...", "signal": "...", "severity": "critical|high|medium"}}, ...],
+  "legitimate_signals": [{{"type": "...", "signal": "...", "severity": "positive"}}, ...],
+  "final_recommendation": "detailed recommendation text",
+  "immediate_precautions": ["step1", "step2", ...],
+  "verification_steps": ["step1", "step2", ...]
+}}
+
+Research guidelines:
+- For company_website: Find official site, not job board
+- For domain_age: Estimate from WHOIS if possible, else null
+- For salary_benchmark: Use Indian market data (role × city)
+- For signals: Be specific, cite evidence from posting
+- For recommendations: Actionable, practical steps
+"""
+
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",  # Fast, cheap, smart enough
+            messages=[
+                {"role": "system", "content": "You are a job scam detection expert. Return only valid JSON."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.1,
+            max_tokens=2500,
+            response_format={"type": "json_object"}
+        )
+        content = response.choices[0].message.content
+        return json.loads(content)
+    except Exception as e:
+        print(f"AI research error: {e}")
+        return {}
 
 
 def predict_risk(
@@ -96,56 +213,75 @@ def predict_risk(
     summary = generate_summary(risk_tier, risk_score, checks)
     recommendation = generate_recommendation(risk_tier, checks)
 
-    # --- Detailed Analysis Fields ---
-
-    # Company Research & Verification
-    company_website = extract_company_website(company_name, job_description, job_url)
-    domain_age = estimate_domain_age(company_website) if company_website else None
-    linkedin_company = find_linkedin_company(company_name)
-    glassdoor_company = find_glassdoor_company(company_name)
-    company_registration_status = check_company_registration(company_name)
-    domain_ownership_status = check_domain_ownership(company_name, company_website)
-    physical_address_status = check_physical_address(job_description, company_name)
-    years_operation_status = check_years_operation(company_name, domain_age)
-
-    # Location Verification
-    company_locations = extract_company_locations(job_description, company_name)
-    job_location = location if location else extract_job_location(job_description)
-    user_location = location
-    work_type = determine_work_type(job_description, employment_type)
-    location_match_status, location_match_details, location_analysis_notes = analyze_location_match(
-        company_locations, job_location, user_location, work_type
+    # --- AI Research Enrichment ---
+    ai_data = enrich_with_ai_research(
+        job_title, company_name, job_description, job_url,
+        recruiter_email, recruiter_phone, location, salary_text,
+        risk_score, risk_tier
     )
 
+    # --- Detailed Analysis Fields (AI first, fallback to stubs) ---
+    def ai_get(key, default=None):
+        return ai_data.get(key, default)
+
+    # Company Research & Verification
+    company_website = ai_get("company_website") or extract_company_website(company_name, job_description, job_url)
+    domain_age = ai_get("domain_age_days") or estimate_domain_age(company_website) if company_website else None
+    linkedin_company = ai_get("linkedin_company_url") or find_linkedin_company(company_name)
+    glassdoor_company = ai_get("glassdoor_company_url") or find_glassdoor_company(company_name)
+    company_registration_status = ai_get("company_registration_status") or check_company_registration(company_name)
+    domain_ownership_status = ai_get("domain_ownership_match") or check_domain_ownership(company_name, company_website)
+    physical_address_status = ai_get("physical_address_verified")
+    if physical_address_status is None:
+        physical_address_status = check_physical_address(job_description, company_name)
+    years_operation_status = ai_get("years_in_operation") or check_years_operation(company_name, domain_age)
+
+    # Location Verification
+    company_locations = ai_get("company_locations") or extract_company_locations(job_description, company_name)
+    job_location = ai_get("job_location") or (location if location else extract_job_location(job_description))
+    user_location = location
+    work_type = ai_get("work_type") or determine_work_type(job_description, employment_type)
+    location_match_status = ai_get("location_match_status")
+    location_match_details = ai_get("location_match_details")
+    location_analysis_notes = ai_get("location_analysis_notes")
+    if location_match_status is None:
+        location_match_status, location_match_details, location_analysis_notes = analyze_location_match(
+            company_locations, job_location, user_location, work_type
+        )
+
     # Contact Verification
-    recruiter_name = extract_recruiter_name(job_description, raw_text)
-    email_domain_verified = verify_email_domain(recruiter_email, company_name, company_website)
-    recruiter_linkedin = find_recruiter_linkedin(recruiter_name, company_name)
-    linkedin_verified = verify_linkedin_profile(recruiter_linkedin, company_name)
-    directory_match = check_employee_directory(recruiter_name, company_name)
-    official_channel = check_official_channel(job_description, recruiter_email, recruiter_phone)
+    recruiter_name = ai_get("recruiter_name") or extract_recruiter_name(job_description, raw_text)
+    email_domain_verified = ai_get("email_domain_verified") if ai_get("email_domain_verified") is not None else verify_email_domain(recruiter_email, company_name, company_website)
+    recruiter_linkedin = ai_get("recruiter_linkedin_url") or find_recruiter_linkedin(recruiter_name, company_name)
+    linkedin_verified = ai_get("linkedin_verified") or verify_linkedin_profile(recruiter_linkedin, company_name)
+    directory_match = ai_get("directory_match") or check_employee_directory(recruiter_name, company_name)
+    official_channel = ai_get("official_channel") or check_official_channel(job_description, recruiter_email, recruiter_phone)
 
     # Salary & Job Verification
-    salary_benchmark = get_salary_benchmark(job_title, location)
-    responsibilities = extract_responsibilities(job_description)
-    requirements = extract_requirements(job_description)
-    salary_in_range = check_salary_in_range(salary_text, job_title, location)
-    no_unrealistic_salary = check_no_unrealistic_salary(salary_text, job_title)
-    clear_structure = check_clear_structure(job_description)
-    job_structure_complete = check_job_structure_complete(job_description)
+    salary_benchmark = ai_get("salary_benchmark") or get_salary_benchmark(job_title, location)
+    responsibilities = ai_get("responsibilities") or extract_responsibilities(job_description)
+    requirements = ai_get("requirements") or extract_requirements(job_description)
+    salary_in_range = ai_get("salary_in_range") or check_salary_in_range(salary_text, job_title, location)
+    no_unrealistic_salary = ai_get("no_unrealistic_salary") or check_no_unrealistic_salary(salary_text, job_title)
+    clear_structure = ai_get("clear_structure") or check_clear_structure(job_description)
+    job_structure_complete = ai_get("job_structure_complete") or check_job_structure_complete(job_description)
 
     # Grammar & Content Analysis
-    grammar_errors, spacing_issues, suspicious_phrases, urgency_language, grammar_examples = analyze_grammar_and_content(combined_text)
-    content_assessment = generate_content_assessment(grammar_errors, spacing_issues, suspicious_phrases, urgency_language)
+    grammar_errors = ai_get("grammar_errors") if ai_get("grammar_errors") is not None else 0
+    spacing_issues = ai_get("spacing_issues") if ai_get("spacing_issues") is not None else 0
+    suspicious_phrases = ai_get("suspicious_phrases") if ai_get("suspicious_phrases") is not None else 0
+    urgency_language = ai_get("urgency_language") if ai_get("urgency_language") is not None else 0
+    grammar_examples = ai_get("grammar_examples") or []
+    content_assessment = ai_get("content_assessment") or generate_content_assessment(grammar_errors, spacing_issues, suspicious_phrases, urgency_language)
 
     # Scam/Legit Pattern Detection
-    suspicious_signals = detect_suspicious_signals(job_title, company_name, job_description, job_url, recruiter_email, combined_text)
-    legitimate_signals = detect_legitimate_signals(job_title, company_name, job_description, job_url, recruiter_email, combined_text)
+    suspicious_signals = ai_get("suspicious_signals") or detect_suspicious_signals(job_title, company_name, job_description, job_url, recruiter_email, combined_text)
+    legitimate_signals = ai_get("legitimate_signals") or detect_legitimate_signals(job_title, company_name, job_description, job_url, recruiter_email, combined_text)
 
     # Final Recommendations
-    final_recommendation = generate_final_recommendation(risk_tier, risk_score, checks)
-    immediate_precautions = generate_immediate_precautions(risk_tier, checks)
-    verification_steps = generate_verification_steps(risk_tier, checks)
+    final_recommendation = ai_get("final_recommendation") or generate_final_recommendation(risk_tier, risk_score, checks)
+    immediate_precautions = ai_get("immediate_precautions") or generate_immediate_precautions(risk_tier, checks)
+    verification_steps = ai_get("verification_steps") or generate_verification_steps(risk_tier, checks)
 
     return AnalysisResult(
         # Core results
