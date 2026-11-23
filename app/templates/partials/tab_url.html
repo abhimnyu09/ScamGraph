@@ -1,25 +1,26 @@
-<form hx-post="/extract-url" hx-target="#url-result" hx-swap="innerHTML" hx-indicator="#url-spinner" class="space-y-6">
+<form hx-post="/extract-url" hx-target="#url-result" hx-swap="innerHTML" hx-indicator="#url-spinner" class="space-y-6" id="url-form" data-mode="url">
     <div>
-        <label for="url" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        <label for="url" class="block text-sm font-medium text-text-secondary mb-1">
             Job Posting URL
         </label>
         <div class="flex gap-2">
             <input type="url" name="url" id="url" required
                 placeholder="https://linkedin.com/jobs/view/... or https://naukri.com/job-listings-..."
-                class="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition">
+                class="input-field flex-1"
+                maxlength="500">
             <button type="submit"
-                class="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition flex items-center gap-2"
+                class="btn-primary px-6 flex items-center gap-2 w-full sm:w-auto"
                 id="url-spinner">
                 <span class="htmx-indicator">
                     <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                 </span>
-                <span class="htmx-indicator:hidden">
+                <span class="htmx-indicator:hidden flex items-center gap-2">
                     <i data-lucide="search" class="w-5 h-5"></i>
                     Extract
                 </span>
             </button>
         </div>
-        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+        <p class="mt-1 text-xs text-text-muted">
             Supported: LinkedIn, Naukri, Indeed, Glassdoor, company careers pages (Greenhouse, Lever, Workday, etc.)
         </p>
     </div>
@@ -31,3 +32,20 @@
 
 <!-- Prefilled form (returned after successful extraction) -->
 <div id="prefilled-form-container" class="hidden"></div>
+
+<script>
+    // HTMX event to auto-switch to text tab after successful extraction
+    document.body.addEventListener('htmx:afterSwap', (e) => {
+        if (e.detail.target.id === 'url-result') {
+            lucide.createIcons();
+            // Show prefilled form container if it has content
+            const container = document.getElementById('prefilled-form-container');
+            if (container && container.innerHTML.trim()) {
+                container.classList.remove('hidden');
+                // Switch to text tab to show prefilled form
+                const textTab = document.querySelector('[data-tab="text"]');
+                if (textTab) textTab.click();
+            }
+        }
+    });
+</script>

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr, validator
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 
 
 class CheckResult(BaseModel):
@@ -11,12 +11,67 @@ class CheckResult(BaseModel):
 
 
 class AnalysisResult(BaseModel):
+    # Core results
     risk_score: int
     risk_tier: str
     checks: List[CheckResult]
     summary: str
     recommendation: str
     model_version: str = "1.0.0"
+
+    # Company Research & Verification
+    company_website: Optional[str] = None
+    domain_age: Optional[int] = None
+    linkedin_company: Optional[str] = None
+    glassdoor_company: Optional[str] = None
+    company_registration_status: Optional[str] = None
+    domain_ownership_status: Optional[str] = None
+    physical_address_status: Optional[str] = None
+    years_operation_status: Optional[str] = None
+
+    # Location Verification
+    company_locations: Optional[str] = None
+    job_location: Optional[str] = None
+    user_location: Optional[str] = None
+    work_type: Optional[str] = None
+    location_match_status: Optional[str] = None
+    location_match_details: Optional[str] = None
+    location_analysis_notes: Optional[str] = None
+
+    # Contact Verification
+    recruiter_name: Optional[str] = None
+    email_domain_verified: bool = False
+    recruiter_linkedin: Optional[str] = None
+    linkedin_verified: Optional[str] = None
+    directory_match: Optional[str] = None
+    official_channel: Optional[str] = None
+
+    # Salary & Job Verification
+    salary_text: Optional[str] = None
+    salary_benchmark: Optional[str] = None
+    responsibilities: Optional[str] = None
+    requirements: Optional[str] = None
+    salary_in_range: Optional[str] = None
+    no_unrealistic_salary: Optional[str] = None
+    clear_structure: Optional[str] = None
+    job_structure_complete: Optional[str] = None
+
+    # Grammar & Content Analysis
+    grammar_errors: int = 0
+    spacing_issues: int = 0
+    suspicious_phrases: int = 0
+    urgency_language: int = 0
+    grammar_examples: List[str] = []
+    content_assessment: Optional[str] = None
+
+    # Scam/Legit Pattern Detection
+    suspicious_signals: List[Dict[str, Any]] = []
+    legitimate_signals: List[Dict[str, Any]] = []
+
+    # Final Recommendations
+    final_recommendation: Optional[str] = None
+    immediate_precautions: List[str] = []
+    verification_steps: List[str] = []
 
 
 class TelegramMessage(BaseModel):

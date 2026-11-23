@@ -1,164 +1,201 @@
-<form hx-post="/analyze" hx-target="#result-container" hx-swap="innerHTML" hx-indicator="#submit-spinner" class="space-y-6">
+<form hx-post="/analyze" hx-target="#result-container" hx-swap="innerHTML" hx-indicator="#submit-spinner" class="space-y-6" id="text-form" data-mode="text">
     <!-- Required Fields -->
-    <div class="space-y-4">
-        <h3 class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-            <i data-lucide="asterisk" class="w-4 h-4 text-primary-600"></i>
+    <div class="space-y-5">
+        <h3 class="text-sm font-semibold text-text-primary flex items-center gap-2">
+            <i data-lucide="asterisk" class="w-4 h-4 text-brand-emerald"></i>
             Required Fields
         </h3>
 
         <div>
-            <label for="job_title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Job Title <span class="text-red-500">*</span>
+            <label for="job_title" class="block text-sm font-medium text-text-secondary mb-1">
+                Job Title <span class="text-brand-red">*</span>
             </label>
             <input type="text" name="job_title" id="job_title" required
                 placeholder="e.g., Senior Software Engineer, Data Entry Operator"
-                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
+                class="input-field"
                 maxlength="200">
+            <p class="mt-1 text-xs text-text-muted text-right"><span id="job_title-count">0</span>/200</p>
         </div>
 
         <div>
-            <label for="company_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Company Name <span class="text-red-500">*</span>
+            <label for="company_name" class="block text-sm font-medium text-text-secondary mb-1">
+                Company Name <span class="text-brand-red">*</span>
             </label>
             <input type="text" name="company_name" id="company_name" required
                 placeholder="e.g., Google, TCS, StartupXYZ"
-                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
+                class="input-field"
                 maxlength="200">
+            <p class="mt-1 text-xs text-text-muted text-right"><span id="company_name-count">0</span>/200</p>
         </div>
 
         <div>
-            <label for="job_description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Job Description <span class="text-red-500">*</span>
+            <label for="job_description" class="block text-sm font-medium text-text-secondary mb-1">
+                Job Description <span class="text-brand-red">*</span>
             </label>
             <textarea name="job_description" id="job_description" required rows="8"
                 placeholder="Paste the full job description here... (minimum 50 characters)"
-                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition font-mono text-sm"
+                class="input-field font-mono text-sm"
                 maxlength="20000"></textarea>
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Include responsibilities, requirements, benefits, salary info — everything from the posting.</p>
+            <p class="mt-1 text-xs text-text-muted text-right"><span id="job_description-count">0</span>/20000</p>
+            <p class="mt-1 text-xs text-text-muted">Include responsibilities, requirements, benefits, salary info — everything from the posting.</p>
         </div>
     </div>
 
     <!-- Enhanced Accuracy Accordion -->
-    <details class="group border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-        <summary class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 cursor-pointer list-none">
+    <details class="group border border-surface-border rounded-xl overflow-hidden">
+        <summary class="flex items-center justify-between p-4 bg-bg-secondary cursor-pointer list-none">
             <div class="flex items-center gap-3">
-                <i data-lucide="sliders-horizontal" class="w-5 h-5 text-gray-500 dark:text-gray-400"></i>
-                <span class="font-medium text-gray-900 dark:text-white">Enhanced Accuracy (Optional)</span>
-                <span class="text-xs text-gray-500 dark:text-gray-400">Improves detection accuracy</span>
+                <i data-lucide="sliders-horizontal" class="w-5 h-5 text-text-muted"></i>
+                <span class="font-medium text-text-primary">Enhanced Accuracy (Optional)</span>
+                <span class="text-xs text-text-muted">Improves detection accuracy</span>
             </div>
-            <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform"></i>
+            <i data-lucide="chevron-down" class="w-5 h-5 text-text-muted group-open:rotate-180 transition-transform"></i>
         </summary>
-        <div class="p-4 space-y-4">
+        <div class="p-4 pt-0 space-y-5 border-t border-surface-border">
             <div class="grid sm:grid-cols-2 gap-4">
                 <div>
-                    <label for="job_url" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Job Posting URL
-                    </label>
+                    <label for="job_url" class="block text-sm font-medium text-text-secondary mb-1">Job Posting URL</label>
                     <input type="url" name="job_url" id="job_url"
                         placeholder="https://linkedin.com/jobs/view/..."
-                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition">
+                        class="input-field">
                 </div>
                 <div>
-                    <label for="location" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Location
-                    </label>
+                    <label for="location" class="block text-sm font-medium text-text-secondary mb-1">Location</label>
                     <input type="text" name="location" id="location"
                         placeholder="e.g., Bangalore, Remote, Hybrid"
-                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition">
+                        class="input-field"
+                        maxlength="100">
                 </div>
             </div>
-
             <div class="grid sm:grid-cols-2 gap-4">
                 <div>
-                    <label for="recruiter_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Recruiter Name
-                    </label>
+                    <label for="recruiter_name" class="block text-sm font-medium text-text-secondary mb-1">Recruiter Name</label>
                     <input type="text" name="recruiter_name" id="recruiter_name"
                         placeholder="e.g., Priya Sharma"
-                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition">
+                        class="input-field"
+                        maxlength="100">
                 </div>
                 <div>
-                    <label for="recruiter_email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Recruiter Email
-                    </label>
+                    <label for="recruiter_email" class="block text-sm font-medium text-text-secondary mb-1">Recruiter Email</label>
                     <input type="email" name="recruiter_email" id="recruiter_email"
-                        placeholder="e.g., priya@company.com"
-                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition">
+                        placeholder="e.g., recruiting@company.com"
+                        class="input-field"
+                        maxlength="100">
                 </div>
             </div>
-
             <div class="grid sm:grid-cols-2 gap-4">
                 <div>
-                    <label for="recruiter_phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Recruiter Phone
-                    </label>
+                    <label for="recruiter_phone" class="block text-sm font-medium text-text-secondary mb-1">Recruiter Phone</label>
                     <input type="tel" name="recruiter_phone" id="recruiter_phone"
                         placeholder="e.g., +91 98765 43210"
-                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition">
+                        class="input-field"
+                        maxlength="30">
                 </div>
                 <div>
-                    <label for="salary_text" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Salary / CTC Mentioned
-                    </label>
+                    <label for="salary_text" class="block text-sm font-medium text-text-secondary mb-1">Salary / Compensation</label>
                     <input type="text" name="salary_text" id="salary_text"
-                        placeholder="e.g., ₹12-15 LPA, $80k-100k"
-                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition">
+                        placeholder="e.g., ₹15-25 LPA, $120k/year, Competitive"
+                        class="input-field"
+                        maxlength="100">
                 </div>
             </div>
-
-            <div>
-                <label for="employment_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Employment Type
-                </label>
-                <select name="employment_type" id="employment_type"
-                    class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition">
-                    <option value="">Select...</option>
-                    <option value="full-time">Full-time</option>
-                    <option value="part-time">Part-time</option>
-                    <option value="contract">Contract</option>
-                    <option value="internship">Internship</option>
-                    <option value="freelance">Freelance</option>
-                </select>
+            <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                    <label for="employment_type" class="block text-sm font-medium text-text-secondary mb-1">Employment Type</label>
+                    <select name="employment_type" id="employment_type" class="input-field">
+                        <option value="">Select type</option>
+                        <option value="full_time">Full-time</option>
+                        <option value="part_time">Part-time</option>
+                        <option value="contract">Contract</option>
+                        <option value="internship">Internship</option>
+                        <option value="freelance">Freelance</option>
+                    </select>
+                </div>
             </div>
         </div>
     </details>
 
-    <!-- Raw Paste Alternative -->
-    <details class="group border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-        <summary class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 cursor-pointer list-none">
+    <!-- Raw Paste Fallback -->
+    <details class="group border border-surface-border rounded-xl overflow-hidden">
+        <summary class="flex items-center justify-between p-4 bg-bg-secondary cursor-pointer list-none">
             <div class="flex items-center gap-3">
-                <i data-lucide="clipboard" class="w-5 h-5 text-gray-500 dark:text-gray-400"></i>
-                <span class="font-medium text-gray-900 dark:text-white">Or Paste Everything Here</span>
-                <span class="text-xs text-gray-500 dark:text-gray-400">We'll parse it automatically</span>
+                <i data-lucide="clipboard-paste" class="w-5 h-5 text-text-muted"></i>
+                <span class="font-medium text-text-primary">Raw Paste (Quick Mode)</span>
+                <span class="text-xs text-text-muted">Paste entire message at once</span>
             </div>
-            <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform"></i>
+            <i data-lucide="chevron-down" class="w-5 h-5 text-text-muted group-open:rotate-180 transition-transform"></i>
         </summary>
-        <div class="p-4">
-            <textarea name="raw_text" rows="6"
-                placeholder="Paste the entire job message, email, or chat forward here...&#10;&#10;Example:&#10;Job Title: Python Developer&#10;Company: TechCorp&#10;Description: We are hiring...&#10;Recruiter: John (john@gmail.com)&#10;WhatsApp: +91 98765 43210&#10;Salary: 20 LPA"
-                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition font-mono text-sm"
-                maxlength="30000"></textarea>
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Include title, company, description, recruiter contact, salary — anything you have.</p>
+        <div class="p-4 pt-0 space-y-4 border-t border-surface-border">
+            <div>
+                <label for="raw_text" class="block text-sm font-medium text-text-secondary mb-1">
+                    Paste Full Job Message
+                </label>
+                <textarea name="raw_text" id="raw_text" rows="6"
+                    placeholder="Forward the entire WhatsApp/Telegram/Email message here. We'll extract title, company, and description automatically."
+                    class="input-field font-mono text-sm"
+                    maxlength="20000"></textarea>
+                <p class="mt-1 text-xs text-text-muted">Works with forwarded messages from LinkedIn, Naukri, WhatsApp, Telegram, Email.</p>
+            </div>
         </div>
     </details>
 
     <!-- Submit Button -->
-    <div class="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-800">
-        <button type="submit"
-            class="w-full sm:w-auto px-8 py-3.5 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition disabled:opacity-50 flex items-center gap-2"
-            id="analyze-btn">
-            <span id="submit-spinner" class="htmx-indicator">
+    <div class="pt-4 border-t border-surface-border flex flex-col sm:flex-row items-center gap-4">
+        <button type="submit" class="btn-primary flex-1 sm:flex-none justify-center group w-full sm:w-auto" id="submit-spinner" data-submit-btn>
+            <span class="htmx-indicator:hidden flex items-center gap-2">
+                <i data-lucide="search" class="w-5 h-5"></i>
+                Scan Job Posting
+            </span>
+            <span class="htmx-indicator flex items-center gap-2">
                 <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                 Analyzing...
             </span>
-            <span class="htmx-indicator:hidden">
-                <i data-lucide="search" class="w-5 h-5"></i>
-                Analyze Job Posting
-            </span>
         </button>
-
-        <p class="text-xs text-gray-500 dark:text-gray-400 hidden sm:block">
-            By analyzing, you agree to our <a href="#" class="underline hover:text-primary-600">Privacy Policy</a>. No data sold.
-        </p>
+        <button type="button" class="btn-secondary w-full sm:w-auto" id="clear-btn">
+            <i data-lucide="x" class="w-5 h-5"></i>
+            Clear
+        </button>
     </div>
+
+    <p class="text-center text-xs text-text-muted">
+        Analyzed securely over encrypted connection — we never contact the employer
+    </p>
 </form>
+
+<script>
+    // Character counters
+    const setupCharCounters = () => {
+        const counters = [
+            { input: 'job_title', counter: 'job_title-count', max: 200 },
+            { input: 'company_name', counter: 'company_name-count', max: 200 },
+            { input: 'job_description', counter: 'job_description-count', max: 20000 },
+        ];
+        counters.forEach(({ input, counter, max }) => {
+            const inputEl = document.getElementById(input);
+            const counterEl = document.getElementById(counter);
+            if (inputEl && counterEl) {
+                const update = () => { counterEl.textContent = inputEl.value.length; };
+                inputEl.addEventListener('input', update);
+                update();
+            }
+        });
+    };
+    setupCharCounters();
+
+    // Clear form button
+    const clearBtn = document.getElementById('clear-btn');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+            document.getElementById('text-form').reset();
+            document.getElementById('result-container').innerHTML = `
+                <div class="card p-8 text-center" id="empty-state">
+                    <i data-lucide="search" class="w-16 h-16 text-text-muted mx-auto mb-4"></i>
+                    <h3 class="text-lg font-semibold text-text-primary mb-2">No results yet</h3>
+                    <p class="text-text-secondary">Fill in the job details and click "Scan Job Posting" to see the analysis.</p>
+                </div>
+            `;
+            setupCharCounters();
+            lucide.createIcons();
+        });
+    }
+</script>

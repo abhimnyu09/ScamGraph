@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "app_base.html" %}
 
 {% block title %}Scanner — ScamGraph{% endblock %}
 
@@ -7,455 +7,415 @@
 <meta property="og:description" content="Scan job postings for scam risk. Paste text, upload a screenshot, or drop a URL to get an instant 0-100 risk score with evidence.">
 {% endblock %}
 
-{% block content %}
-<!-- Navigation Bar -->
-<nav class="fixed top-0 left-0 right-0 z-50 bg-bg-secondary/80 backdrop-blur-md border-b border-surface-border">
-    <div class="max-w-7xl mx-auto px-4">
-        <div class="flex items-center justify-between h-16">
-            <a href="/" class="flex items-center gap-2" aria-label="ScamGraph Home">
-                <div class="w-8 h-8 rounded-lg bg-brand-emerald flex items-center justify-center">
-                    <i data-lucide="shield-check" class="w-5 h-5 text-white"></i>
-                </div>
-                <span class="font-bold text-xl text-text-primary">ScamGraph</span>
+{% block app_content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Scanner Page Header -->
+    <div class="mb-8">
+        <div class="flex items-center gap-3 mb-4">
+            <a href="/dashboard" class="btn-ghost p-2 lg:hidden">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
             </a>
-
-            <div class="hidden md:flex items-center gap-6">
-                <a href="/" class="text-text-secondary hover:text-text-primary text-sm font-medium transition-colors">Home</a>
-                <a href="#features" class="text-text-secondary hover:text-text-primary text-sm font-medium transition-colors">How It Works</a>
-                <a href="/dashboard" class="btn-ghost px-4 py-2 text-sm">Sign In</a>
-                <a href="/scanner" class="btn-primary px-5 py-2 text-sm">Get Started</a>
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-bold text-text-primary">Job Scanner</h1>
+                <p class="text-lg text-text-secondary mt-1">Paste text, upload a screenshot, or drop a URL. Get an instant risk score with cited evidence from 8 detection layers.</p>
             </div>
-
-            <button class="md:hidden btn-ghost p-2" id="mobile-menu-btn" aria-label="Open menu">
-                <i data-lucide="menu" class="w-5 h-5"></i>
-            </button>
         </div>
     </div>
-    <div class="md:hidden hidden bg-bg-secondary border-t border-surface-border" id="mobile-menu">
-        <div class="px-4 py-4 space-y-2">
-            <a href="/" class="block px-3 py-2 text-text-secondary hover:text-text-primary hover:bg-surface-tertiary rounded-lg text-sm font-medium">Home</a>
-            <a href="#features" class="block px-3 py-2 text-text-secondary hover:text-text-primary hover:bg-surface-tertiary rounded-lg text-sm font-medium">How It Works</a>
-            <a href="/dashboard" class="block px-3 py-2 text-text-secondary hover:text-text-primary hover:bg-surface-tertiary rounded-lg text-sm font-medium">Sign In</a>
-            <a href="/scanner" class="btn-primary w-full justify-center mt-2">Get Started</a>
-        </div>
-    </div>
-</nav>
 
-<!-- Scanner Page Hero -->
-<header class="relative pt-28 pb-10 px-4">
-    <div class="max-w-7xl mx-auto">
-        <div class="text-center max-w-3xl mx-auto">
-            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-tertiary border border-surface-border mb-6 animate-fade-in">
-                <span class="w-2 h-2 rounded-full bg-brand-emerald animate-pulse"></span>
-                <span class="text-sm font-medium text-text-secondary">Scanner — Analyze any job posting</span>
-            </div>
-            <h1 class="text-4xl sm:text-5xl font-bold text-text-primary leading-tight mb-4 animate-slide-up">
-                Job Scanner
-            </h1>
-            <p class="text-lg text-text-secondary animate-slide-up" style="animation-delay: 100ms;">
-                Paste text, upload a screenshot, or drop a URL. Get an instant risk score with cited evidence from 8 detection layers.
-            </p>
-        </div>
-    </div>
-</header>
+    <!-- Scanner Main Content -->
+    <div class="grid lg:grid-cols-[1fr_320px] gap-6 lg:gap-8">
+        <!-- Left Panel: Input -->
+        <div class="space-y-6 min-w-0">
+            <!-- Mode Tabs -->
+            <div class="card overflow-hidden">
+                <div class="flex border-b border-surface-border bg-bg-secondary" role="tablist">
+                    <button
+                        role="tab"
+                        aria-selected="true"
+                        aria-controls="panel-text"
+                        class="tab-btn-scanner flex-1 py-4 px-6 text-sm font-medium text-text-primary border-b-2 border-brand-emerald bg-surface-tertiary flex items-center justify-center gap-2 min-h-[44px]"
+                        data-tab="text">
+                        <i data-lucide="file-text" class="w-5 h-5"></i>
+                        <span>Text</span>
+                    </button>
+                    <button
+                        role="tab"
+                        aria-selected="false"
+                        aria-controls="panel-url"
+                        class="tab-btn-scanner flex-1 py-4 px-6 text-sm font-medium text-text-muted hover:text-text-secondary flex items-center justify-center gap-2 min-h-[44px]"
+                        data-tab="url">
+                        <i data-lucide="link" class="w-5 h-5"></i>
+                        <span>URL</span>
+                    </button>
+                    <button
+                        role="tab"
+                        aria-selected="false"
+                        aria-controls="panel-image"
+                        class="tab-btn-scanner flex-1 py-4 px-6 text-sm font-medium text-text-muted hover:text-text-secondary flex items-center justify-center gap-2 min-h-[44px]"
+                        data-tab="image">
+                        <i data-lucide="image" class="w-5 h-5"></i>
+                        <span>Screenshot</span>
+                    </button>
+                </div>
 
-<!-- Scanner Main Content -->
-<main class="px-4 pb-20">
-    <div class="max-w-7xl mx-auto">
-        <div class="grid lg:grid-cols-[1fr_320px] gap-6 lg:gap-8">
-            <!-- Left Panel: Input -->
-            <div class="space-y-6 min-w-0">
-                <!-- Mode Tabs -->
-                <div class="card overflow-hidden">
-                    <div class="flex border-b border-surface-border bg-bg-secondary" role="tablist">
-                        <button
-                            role="tab"
-                            aria-selected="true"
-                            aria-controls="panel-text"
-                            class="tab-btn-scanner flex-1 py-4 px-6 text-sm font-medium text-text-primary border-b-2 border-brand-emerald bg-surface-tertiary flex items-center justify-center gap-2"
-                            data-tab="text">
-                            <i data-lucide="file-text" class="w-5 h-5"></i>
-                            <span>Text</span>
-                        </button>
-                        <button
-                            role="tab"
-                            aria-selected="false"
-                            aria-controls="panel-url"
-                            class="tab-btn-scanner flex-1 py-4 px-6 text-sm font-medium text-text-muted hover:text-text-secondary flex items-center justify-center gap-2"
-                            data-tab="url">
-                            <i data-lucide="link" class="w-5 h-5"></i>
-                            <span>URL</span>
-                        </button>
-                        <button
-                            role="tab"
-                            aria-selected="false"
-                            aria-controls="panel-image"
-                            class="tab-btn-scanner flex-1 py-4 px-6 text-sm font-medium text-text-muted hover:text-text-secondary flex items-center justify-center gap-2"
-                            data-tab="image">
-                            <i data-lucide="image" class="w-5 h-5"></i>
-                            <span>Screenshot</span>
-                        </button>
-                    </div>
+                <!-- Tab Panels -->
+                <div class="p-6 space-y-6">
+                    <!-- Text Mode Panel -->
+                    <div class="tab-panel-scanner active" id="panel-text" role="tabpanel" aria-labelledby="tab-text">
+                        <form hx-post="/analyze" hx-target="#result-container" hx-swap="innerHTML" hx-indicator="#submit-spinner" class="space-y-6" id="text-form" data-mode="text">
+                            <!-- Required Fields -->
+                            <div class="space-y-5">
+                                <h3 class="text-sm font-semibold text-text-primary flex items-center gap-2">
+                                    <i data-lucide="asterisk" class="w-4 h-4 text-brand-emerald"></i>
+                                    Required Fields
+                                </h3>
 
-                    <!-- Tab Panels -->
-                    <div class="p-6 space-y-6">
-                        <!-- Text Mode Panel -->
-                        <div class="tab-panel-scanner active" id="panel-text" role="tabpanel" aria-labelledby="tab-text">
-                            <form hx-post="/analyze" hx-target="#result-container" hx-swap="innerHTML" hx-indicator="#submit-spinner" class="space-y-6" id="text-form" data-mode="text">
-                                <!-- Required Fields -->
-                                <div class="space-y-5">
-                                    <h3 class="text-sm font-semibold text-text-primary flex items-center gap-2">
-                                        <i data-lucide="asterisk" class="w-4 h-4 text-brand-emerald"></i>
-                                        Required Fields
-                                    </h3>
+                                <div>
+                                    <label for="job_title" class="block text-sm font-medium text-text-secondary mb-1">
+                                        Job Title <span class="text-brand-red">*</span>
+                                    </label>
+                                    <input type="text" name="job_title" id="job_title" required
+                                        placeholder="e.g., Senior Software Engineer, Data Entry Operator"
+                                        class="input-field"
+                                        maxlength="200">
+                                    <p class="mt-1 text-xs text-text-muted text-right"><span id="job_title-count">0</span>/200</p>
+                                </div>
 
-                                    <div>
-                                        <label for="job_title" class="block text-sm font-medium text-text-secondary mb-1">
-                                            Job Title <span class="text-brand-red">*</span>
-                                        </label>
-                                        <input type="text" name="job_title" id="job_title" required
-                                            placeholder="e.g., Senior Software Engineer, Data Entry Operator"
-                                            class="input-field"
-                                            maxlength="200">
-                                        <p class="mt-1 text-xs text-text-muted text-right"><span id="job_title-count">0</span>/200</p>
+                                <div>
+                                    <label for="company_name" class="block text-sm font-medium text-text-secondary mb-1">
+                                        Company Name <span class="text-brand-red">*</span>
+                                    </label>
+                                    <input type="text" name="company_name" id="company_name" required
+                                        placeholder="e.g., Google, TCS, StartupXYZ"
+                                        class="input-field"
+                                        maxlength="200">
+                                    <p class="mt-1 text-xs text-text-muted text-right"><span id="company_name-count">0</span>/200</p>
+                                </div>
+
+                                <div>
+                                    <label for="job_description" class="block text-sm font-medium text-text-secondary mb-1">
+                                        Job Description <span class="text-brand-red">*</span>
+                                    </label>
+                                    <textarea name="job_description" id="job_description" required rows="8"
+                                        placeholder="Paste the full job description here... (minimum 50 characters)"
+                                        class="input-field font-mono text-sm"
+                                        maxlength="20000"></textarea>
+                                    <p class="mt-1 text-xs text-text-muted text-right"><span id="job_description-count">0</span>/20000</p>
+                                    <p class="mt-1 text-xs text-text-muted">Include responsibilities, requirements, benefits, salary info — everything from the posting.</p>
+                                </div>
+                            </div>
+
+                            <!-- Enhanced Accuracy Accordion -->
+                            <details class="group border border-surface-border rounded-xl overflow-hidden">
+                                <summary class="flex items-center justify-between p-4 bg-bg-secondary cursor-pointer list-none">
+                                    <div class="flex items-center gap-3">
+                                        <i data-lucide="sliders-horizontal" class="w-5 h-5 text-text-muted"></i>
+                                        <span class="font-medium text-text-primary">Enhanced Accuracy (Optional)</span>
+                                        <span class="text-xs text-text-muted">Improves detection accuracy</span>
                                     </div>
-
-                                    <div>
-                                        <label for="company_name" class="block text-sm font-medium text-text-secondary mb-1">
-                                            Company Name <span class="text-brand-red">*</span>
-                                        </label>
-                                        <input type="text" name="company_name" id="company_name" required
-                                            placeholder="e.g., Google, TCS, StartupXYZ"
-                                            class="input-field"
-                                            maxlength="200">
-                                        <p class="mt-1 text-xs text-text-muted text-right"><span id="company_name-count">0</span>/200</p>
+                                    <i data-lucide="chevron-down" class="w-5 h-5 text-text-muted group-open:rotate-180 transition-transform"></i>
+                                </summary>
+                                <div class="p-4 pt-0 space-y-5 border-t border-surface-border">
+                                    <div class="grid sm:grid-cols-2 gap-4">
+                                        <div>
+                                            <label for="job_url" class="block text-sm font-medium text-text-secondary mb-1">Job Posting URL</label>
+                                            <input type="url" name="job_url" id="job_url"
+                                                placeholder="https://linkedin.com/jobs/view/..."
+                                                class="input-field">
+                                        </div>
+                                        <div>
+                                            <label for="location" class="block text-sm font-medium text-text-secondary mb-1">Location</label>
+                                            <input type="text" name="location" id="location"
+                                                placeholder="e.g., Bangalore, Remote, Hybrid"
+                                                class="input-field"
+                                                maxlength="100">
+                                        </div>
                                     </div>
-
+                                    <div class="grid sm:grid-cols-2 gap-4">
+                                        <div>
+                                            <label for="salary_text" class="block text-sm font-medium text-text-secondary mb-1">Salary / Compensation</label>
+                                            <input type="text" name="salary_text" id="salary_text"
+                                                placeholder="e.g., ₹15-25 LPA, $120k/year, Competitive"
+                                                class="input-field"
+                                                maxlength="100">
+                                        </div>
+                                        <div>
+                                            <label for="employment_type" class="block text-sm font-medium text-text-secondary mb-1">Employment Type</label>
+                                            <select name="employment_type" id="employment_type" class="input-field">
+                                                <option value="">Select type</option>
+                                                <option value="full_time">Full-time</option>
+                                                <option value="part_time">Part-time</option>
+                                                <option value="contract">Contract</option>
+                                                <option value="internship">Internship</option>
+                                                <option value="freelance">Freelance</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="grid sm:grid-cols-2 gap-4">
+                                        <div>
+                                            <label for="recruiter_name" class="block text-sm font-medium text-text-secondary mb-1">Recruiter Name</label>
+                                            <input type="text" name="recruiter_name" id="recruiter_name"
+                                                placeholder="e.g., Priya Sharma"
+                                                class="input-field"
+                                                maxlength="100">
+                                        </div>
+                                        <div>
+                                            <label for="recruiter_email" class="block text-sm font-medium text-text-secondary mb-1">Recruiter Email</label>
+                                            <input type="email" name="recruiter_email" id="recruiter_email"
+                                                placeholder="e.g., recruiting@company.com"
+                                                class="input-field"
+                                                maxlength="100">
+                                        </div>
+                                    </div>
                                     <div>
-                                        <label for="job_description" class="block text-sm font-medium text-text-secondary mb-1">
-                                            Job Description <span class="text-brand-red">*</span>
+                                        <label for="recruiter_phone" class="block text-sm font-medium text-text-secondary mb-1">Recruiter Phone</label>
+                                        <input type="tel" name="recruiter_phone" id="recruiter_phone"
+                                            placeholder="e.g., +91 98765 43210"
+                                            class="input-field"
+                                            maxlength="30">
+                                    </div>
+                                </div>
+                            </details>
+
+                            <!-- Raw Paste Fallback -->
+                            <details class="group border border-surface-border rounded-xl overflow-hidden">
+                                <summary class="flex items-center justify-between p-4 bg-bg-secondary cursor-pointer list-none">
+                                    <div class="flex items-center gap-3">
+                                        <i data-lucide="clipboard-paste" class="w-5 h-5 text-text-muted"></i>
+                                        <span class="font-medium text-text-primary">Raw Paste (Quick Mode)</span>
+                                        <span class="text-xs text-text-muted">Paste entire message at once</span>
+                                    </div>
+                                    <i data-lucide="chevron-down" class="w-5 h-5 text-text-muted group-open:rotate-180 transition-transform"></i>
+                                </summary>
+                                <div class="p-4 pt-0 space-y-4 border-t border-surface-border">
+                                    <div>
+                                        <label for="raw_text" class="block text-sm font-medium text-text-secondary mb-1">
+                                            Paste Full Job Message
                                         </label>
-                                        <textarea name="job_description" id="job_description" required rows="8"
-                                            placeholder="Paste the full job description here... (minimum 50 characters)"
+                                        <textarea name="raw_text" id="raw_text" rows="6"
+                                            placeholder="Forward the entire WhatsApp/Telegram/Email message here. We'll extract title, company, and description automatically."
                                             class="input-field font-mono text-sm"
                                             maxlength="20000"></textarea>
-                                        <p class="mt-1 text-xs text-text-muted text-right"><span id="job_description-count">0</span>/20000</p>
-                                        <p class="mt-1 text-xs text-text-muted">Include responsibilities, requirements, benefits, salary info — everything from the posting.</p>
+                                        <p class="mt-1 text-xs text-text-muted">Works with forwarded messages from LinkedIn, Naukri, WhatsApp, Telegram, Email.</p>
                                     </div>
                                 </div>
+                            </details>
 
-                                <!-- Enhanced Accuracy Accordion -->
-                                <details class="group border border-surface-border rounded-xl overflow-hidden">
-                                    <summary class="flex items-center justify-between p-4 bg-bg-secondary cursor-pointer list-none">
-                                        <div class="flex items-center gap-3">
-                                            <i data-lucide="sliders-horizontal" class="w-5 h-5 text-text-muted"></i>
-                                            <span class="font-medium text-text-primary">Enhanced Accuracy (Optional)</span>
-                                            <span class="text-xs text-text-muted">Improves detection accuracy</span>
-                                        </div>
-                                        <i data-lucide="chevron-down" class="w-5 h-5 text-text-muted group-open:rotate-180 transition-transform"></i>
-                                    </summary>
-                                    <div class="p-4 pt-0 space-y-5 border-t border-surface-border">
-                                        <div class="grid sm:grid-cols-2 gap-4">
-                                            <div>
-                                                <label for="job_url" class="block text-sm font-medium text-text-secondary mb-1">Job Posting URL</label>
-                                                <input type="url" name="job_url" id="job_url"
-                                                    placeholder="https://linkedin.com/jobs/view/..."
-                                                    class="input-field">
-                                            </div>
-                                            <div>
-                                                <label for="location" class="block text-sm font-medium text-text-secondary mb-1">Location</label>
-                                                <input type="text" name="location" id="location"
-                                                    placeholder="e.g., Bangalore, Remote, Hybrid"
-                                                    class="input-field"
-                                                    maxlength="100">
-                                            </div>
-                                        </div>
-                                        <div class="grid sm:grid-cols-2 gap-4">
-                                            <div>
-                                                <label for="salary_text" class="block text-sm font-medium text-text-secondary mb-1">Salary / Compensation</label>
-                                                <input type="text" name="salary_text" id="salary_text"
-                                                    placeholder="e.g., ₹15-25 LPA, $120k/year, Competitive"
-                                                    class="input-field"
-                                                    maxlength="100">
-                                            </div>
-                                            <div>
-                                                <label for="employment_type" class="block text-sm font-medium text-text-secondary mb-1">Employment Type</label>
-                                                <select name="employment_type" id="employment_type" class="input-field">
-                                                    <option value="">Select type</option>
-                                                    <option value="full_time">Full-time</option>
-                                                    <option value="part_time">Part-time</option>
-                                                    <option value="contract">Contract</option>
-                                                    <option value="internship">Internship</option>
-                                                    <option value="freelance">Freelance</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="grid sm:grid-cols-2 gap-4">
-                                            <div>
-                                                <label for="recruiter_name" class="block text-sm font-medium text-text-secondary mb-1">Recruiter Name</label>
-                                                <input type="text" name="recruiter_name" id="recruiter_name"
-                                                    placeholder="e.g., Priya Sharma"
-                                                    class="input-field"
-                                                    maxlength="100">
-                                            </div>
-                                            <div>
-                                                <label for="recruiter_email" class="block text-sm font-medium text-text-secondary mb-1">Recruiter Email</label>
-                                                <input type="email" name="recruiter_email" id="recruiter_email"
-                                                    placeholder="e.g., recruiting@company.com"
-                                                    class="input-field"
-                                                    maxlength="100">
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label for="recruiter_phone" class="block text-sm font-medium text-text-secondary mb-1">Recruiter Phone</label>
-                                            <input type="tel" name="recruiter_phone" id="recruiter_phone"
-                                                placeholder="e.g., +91 98765 43210"
-                                                class="input-field"
-                                                maxlength="30">
-                                        </div>
-                                    </div>
-                                </details>
+                            <!-- Submit Button -->
+                            <div class="pt-4 border-t border-surface-border flex flex-col sm:flex-row items-center gap-4">
+                                <button type="submit" class="btn-primary flex-1 sm:flex-none justify-center group w-full sm:w-auto" id="submit-spinner" data-submit-btn>
+                                    <span class="htmx-indicator:hidden flex items-center gap-2">
+                                        <i data-lucide="search" class="w-5 h-5"></i>
+                                        Scan Job Posting
+                                    </span>
+                                    <span class="htmx-indicator flex items-center gap-2">
+                                        <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                        Analyzing...
+                                    </span>
+                                </button>
+                                <button type="button" class="btn-secondary w-full sm:w-auto" id="clear-btn">
+                                    <i data-lucide="x" class="w-5 h-5"></i>
+                                    Clear
+                                </button>
+                            </div>
 
-                                <!-- Raw Paste Fallback -->
-                                <details class="group border border-surface-border rounded-xl overflow-hidden">
-                                    <summary class="flex items-center justify-between p-4 bg-bg-secondary cursor-pointer list-none">
-                                        <div class="flex items-center gap-3">
-                                            <i data-lucide="clipboard-paste" class="w-5 h-5 text-text-muted"></i>
-                                            <span class="font-medium text-text-primary">Raw Paste (Quick Mode)</span>
-                                            <span class="text-xs text-text-muted">Paste entire message at once</span>
-                                        </div>
-                                        <i data-lucide="chevron-down" class="w-5 h-5 text-text-muted group-open:rotate-180 transition-transform"></i>
-                                    </summary>
-                                    <div class="p-4 pt-0 space-y-4 border-t border-surface-border">
-                                        <div>
-                                            <label for="raw_text" class="block text-sm font-medium text-text-secondary mb-1">
-                                                Paste Full Job Message
-                                            </label>
-                                            <textarea name="raw_text" id="raw_text" rows="6"
-                                                placeholder="Forward the entire WhatsApp/Telegram/Email message here. We'll extract title, company, and description automatically."
-                                                class="input-field font-mono text-sm"
-                                                maxlength="20000"></textarea>
-                                            <p class="mt-1 text-xs text-text-muted">Works with forwarded messages from LinkedIn, Naukri, WhatsApp, Telegram, Email.</p>
-                                        </div>
-                                    </div>
-                                </details>
-
-                                <!-- Submit Button -->
-                                <div class="pt-4 border-t border-surface-border flex flex-col sm:flex-row items-center gap-4">
-                                    <button type="submit" class="btn-primary flex-1 sm:flex-none justify-center group w-full sm:w-auto" id="submit-spinner" data-submit-btn>
-                                        <span class="htmx-indicator:hidden flex items-center gap-2">
-                                            <i data-lucide="search" class="w-5 h-5"></i>
-                                            Scan Job Posting
-                                        </span>
-                                        <span class="htmx-indicator flex items-center gap-2">
-                                            <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                            Analyzing...
-                                        </span>
-                                    </button>
-                                    <button type="button" class="btn-secondary w-full sm:w-auto" id="clear-btn">
-                                        <i data-lucide="x" class="w-5 h-5"></i>
-                                        Clear
-                                    </button>
-                                </div>
-
-                                <p class="text-center text-xs text-text-muted">
-                                    Analyzed securely over encrypted connection — we never contact the employer
-                                </p>
-                            </form>
-                        </div>
-
-                        <!-- URL Mode Panel -->
-                        <div class="tab-panel-scanner" id="panel-url" role="tabpanel" aria-labelledby="tab-url">
-                            <form hx-post="/extract-url" hx-target="#url-result" hx-swap="innerHTML" hx-indicator="#url-spinner" class="space-y-6" id="url-form" data-mode="url">
-                                <div>
-                                    <label for="url" class="block text-sm font-medium text-text-secondary mb-1">
-                                        Job Posting URL
-                                    </label>
-                                    <div class="flex gap-2">
-                                        <input type="url" name="url" id="url" required
-                                            placeholder="https://linkedin.com/jobs/view/... or https://naukri.com/job-listings-..."
-                                            class="input-field flex-1"
-                                            maxlength="500">
-                                        <button type="submit"
-                                            class="btn-primary px-6 flex items-center gap-2 w-full sm:w-auto"
-                                            id="url-spinner">
-                                            <span class="htmx-indicator">
-                                                <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                            </span>
-                                            <span class="htmx-indicator:hidden flex items-center gap-2">
-                                                <i data-lucide="search" class="w-5 h-5"></i>
-                                                Extract
-                                            </span>
-                                        </button>
-                                    </div>
-                                    <p class="mt-1 text-xs text-text-muted">
-                                        Supported: LinkedIn, Naukri, Indeed, Glassdoor, company careers pages (Greenhouse, Lever, Workday, etc.)
-                                    </p>
-                                </div>
-
-                                <div id="url-result">
-                                    <!-- Extracted job details will appear here -->
-                                </div>
-                            </form>
-
-                            <!-- Prefilled form container (hidden until extraction succeeds) -->
-                            <div id="prefilled-form-container" class="hidden"></div>
-                        </div>
-
-                        <!-- Image Mode Panel -->
-                        <div class="tab-panel-scanner" id="panel-image" role="tabpanel" aria-labelledby="tab-image">
-                            <form hx-post="/analyze/image" hx-target="#result-container" hx-swap="innerHTML" hx-indicator="#image-spinner" class="space-y-6" id="image-form" enctype="multipart/form-data" data-mode="image">
-                                <!-- Drop Zone -->
-                                <div class="relative">
-                                    <div class="border-2 border-dashed border-surface-border rounded-xl p-10 text-center hover:border-brand-emerald/50 transition-colors relative bg-bg-secondary" id="drop-zone">
-                                        <input type="file" name="image" id="image-input" accept="image/png,image/jpeg,image/jpg,image/webp" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" style="z-index: 10;" aria-label="Upload screenshot">
-                                        <i data-lucide="upload" class="w-16 h-16 text-text-muted mx-auto mb-4"></i>
-                                        <p class="text-lg text-text-secondary mb-1">Drag & drop a screenshot</p>
-                                        <p class="text-sm text-text-muted mb-6">or click to browse (PNG, JPG, WebP up to 10MB)</p>
-                                        <button type="button" class="btn-secondary" onclick="document.getElementById('image-input').click()">
-                                            <i data-lucide="folder-open" class="w-5 h-5 mr-2"></i>
-                                            Choose File
-                                        </button>
-                                        <p class="mt-4 text-xs text-text-muted">Click or drag a file to upload</p>
-                                    </div>
-
-                                    <!-- Image Preview -->
-                                    <div id="image-preview" class="hidden">
-                                        <div class="relative max-w-md mx-auto">
-                                            <img id="preview-img" src="" alt="Screenshot preview" class="rounded-xl border border-surface-border w-full">
-                                            <button type="button" onclick="clearImagePreview()" class="absolute top-2 right-2 w-8 h-8 rounded-full bg-brand-red/80 hover:bg-brand-red text-white flex items-center justify-center" aria-label="Remove image">
-                                                <i data-lucide="x" class="w-4 h-4"></i>
-                                            </button>
-                                        </div>
-                                        <p class="text-center text-sm text-text-secondary mt-2">Screenshot ready for analysis</p>
-                                        <p class="text-center text-xs text-text-muted mt-1" id="ocr-status"></p>
-                                    </div>
-                                </div>
-
-                                <!-- OCR Status -->
-                                <div id="ocr-loading" class="hidden flex items-center justify-center gap-3 p-4 bg-brand-amberLight border border-brand-amber/30 rounded-xl">
-                                    <svg class="animate-spin h-5 w-5 text-brand-amber" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                    <span class="text-sm text-text-secondary">Extracting text from image...</span>
-                                </div>
-
-                                <div class="flex items-center justify-center gap-4 pt-4 border-t border-surface-border">
-                                    <button type="submit" class="btn-primary w-full max-w-md justify-center group" id="image-spinner" disabled>
-                                        <span class="htmx-indicator:hidden flex items-center gap-2">
-                                            <i data-lucide="search" class="w-5 h-5"></i>
-                                            Scan Screenshot
-                                        </span>
-                                        <span class="htmx-indicator flex items-center gap-2">
-                                            <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                            Analyzing...
-                                        </span>
-                                    </button>
-                                </div>
-
-                                <p class="text-center text-xs text-text-muted">
-                                    OCR extraction runs locally — image never leaves your device
-                                </p>
-                            </form>
-                        </div>
+                            <p class="text-center text-xs text-text-muted">
+                                Analyzed securely over encrypted connection — we never contact the employer
+                            </p>
+                        </form>
                     </div>
-                </div>
 
-                <!-- Result Container -->
-                <div id="result-container" class="space-y-6">
-                    <!-- Results will be injected here via HTMX -->
-                    <div class="card p-8 text-center" id="empty-state">
-                        <i data-lucide="search" class="w-16 h-16 text-text-muted mx-auto mb-4"></i>
-                        <h3 class="text-lg font-semibold text-text-primary mb-2">No results yet</h3>
-                        <p class="text-text-secondary">Fill in the job details and click "Scan Job Posting" to see the analysis.</p>
+                    <!-- URL Mode Panel -->
+                    <div class="tab-panel-scanner" id="panel-url" role="tabpanel" aria-labelledby="tab-url">
+                        <form hx-post="/extract-url" hx-target="#url-result" hx-swap="innerHTML" hx-indicator="#url-spinner" class="space-y-6" id="url-form" data-mode="url">
+                            <div>
+                                <label for="url" class="block text-sm font-medium text-text-secondary mb-1">
+                                    Job Posting URL
+                                </label>
+                                <div class="flex gap-2">
+                                    <input type="url" name="url" id="url" required
+                                        placeholder="https://linkedin.com/jobs/view/... or https://naukri.com/job-listings-..."
+                                        class="input-field flex-1"
+                                        maxlength="500">
+                                    <button type="submit"
+                                        class="btn-primary px-6 flex items-center gap-2 w-full sm:w-auto"
+                                        id="url-spinner">
+                                        <span class="htmx-indicator">
+                                            <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                        </span>
+                                        <span class="htmx-indicator:hidden flex items-center gap-2">
+                                            <i data-lucide="search" class="w-5 h-5"></i>
+                                            Extract
+                                        </span>
+                                    </button>
+                                </div>
+                                <p class="mt-1 text-xs text-text-muted">
+                                    Supported: LinkedIn, Naukri, Indeed, Glassdoor, company careers pages (Greenhouse, Lever, Workday, etc.)
+                                </p>
+                            </div>
+
+                            <div id="url-result">
+                                <!-- Extracted job details will appear here -->
+                            </div>
+                        </form>
+
+                        <!-- Prefilled form container (hidden until extraction succeeds) -->
+                        <div id="prefilled-form-container" class="hidden"></div>
+                    </div>
+
+                    <!-- Image Mode Panel -->
+                    <div class="tab-panel-scanner" id="panel-image" role="tabpanel" aria-labelledby="tab-image">
+                        <form hx-post="/analyze/image" hx-target="#result-container" hx-swap="innerHTML" hx-indicator="#image-spinner" class="space-y-6" id="image-form" enctype="multipart/form-data" data-mode="image">
+                            <!-- Drop Zone -->
+                            <div class="relative">
+                                <div class="border-2 border-dashed border-surface-border rounded-xl p-10 text-center hover:border-brand-emerald/50 transition-colors relative bg-bg-secondary" id="drop-zone">
+                                    <input type="file" name="image" id="image-input" accept="image/png,image/jpeg,image/jpg,image/webp" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" style="z-index: 10;" aria-label="Upload screenshot">
+                                    <i data-lucide="upload" class="w-16 h-16 text-text-muted mx-auto mb-4"></i>
+                                    <p class="text-lg text-text-secondary mb-1">Drag & drop a screenshot</p>
+                                    <p class="text-sm text-text-muted mb-6">or click to browse (PNG, JPG, WebP up to 10MB)</p>
+                                    <button type="button" class="btn-secondary" onclick="document.getElementById('image-input').click()">
+                                        <i data-lucide="folder-open" class="w-5 h-5 mr-2"></i>
+                                        Choose File
+                                    </button>
+                                    <p class="mt-4 text-xs text-text-muted">Click or drag a file to upload</p>
+                                </div>
+
+                                <!-- Image Preview -->
+                                <div id="image-preview" class="hidden">
+                                    <div class="relative max-w-md mx-auto">
+                                        <img id="preview-img" src="" alt="Screenshot preview" class="rounded-xl border border-surface-border w-full">
+                                        <button type="button" onclick="clearImagePreview()" class="absolute top-2 right-2 w-8 h-8 rounded-full bg-brand-red/80 hover:bg-brand-red text-white flex items-center justify-center" aria-label="Remove image">
+                                            <i data-lucide="x" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                    <p class="text-center text-sm text-text-secondary mt-2">Screenshot ready for analysis</p>
+                                    <p class="text-center text-xs text-text-muted mt-1" id="ocr-status"></p>
+                                </div>
+                            </div>
+
+                            <!-- OCR Status -->
+                            <div id="ocr-loading" class="hidden flex items-center justify-center gap-3 p-4 bg-brand-amberLight border border-brand-amber/30 rounded-xl">
+                                <svg class="animate-spin h-5 w-5 text-brand-amber" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                <span class="text-sm text-text-secondary">Extracting text from image...</span>
+                            </div>
+
+                            <div class="flex items-center justify-center gap-4 pt-4 border-t border-surface-border">
+                                <button type="submit" class="btn-primary w-full max-w-md justify-center group" id="image-spinner" disabled>
+                                    <span class="htmx-indicator:hidden flex items-center gap-2">
+                                        <i data-lucide="search" class="w-5 h-5"></i>
+                                        Scan Screenshot
+                                    </span>
+                                    <span class="htmx-indicator flex items-center gap-2">
+                                        <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                        Analyzing...
+                                    </span>
+                                </button>
+                            </div>
+
+                            <p class="text-center text-xs text-text-muted">
+                                OCR extraction runs locally — image never leaves your device
+                            </p>
+                        </form>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Panel: Info & Tips -->
-            <div class="space-y-6 lg:sticky lg:top-24">
-                <!-- Detection Layers Card -->
-                <div class="card p-5">
-                    <h3 class="font-semibold text-text-primary mb-4 flex items-center gap-2">
-                        <i data-lucide="layers" class="w-5 h-5 text-brand-emerald"></i>
-                        8 Detection Layers
-                    </h3>
-                    <ul class="space-y-3 text-sm">
-                        {% set layers = [
-                            ("Company Authentication", "Verifies legal entity & domain ownership", "emerald"),
-                            ("Careers Page Verification", "Cross-references official listings", "emerald"),
-                            ("Recruiter Identity", "Validates email domain & affiliation", "amber"),
-                            ("Salary Benchmarking", "Compares against market rates", "amber"),
-                            ("Scam Pattern Detection", "ML detection of fee/task/identity scams", "red"),
-                            ("Contact Validation", "Verifies phone, email, channels", "amber"),
-                            ("Domain & SSL Intelligence", "Analyzes age, certs, infrastructure", "emerald"),
-                            ("Live Threat Intelligence", "Real-time scam database checks", "red"),
-                        ] %}
-                        {% for name, desc, color in layers %}
-                        <li class="flex items-start gap-3">
-                            <span class="w-2 h-2 mt-2 rounded-full bg-brand-{{color}} flex-shrink-0"></span>
-                            <div>
-                                <p class="font-medium text-text-primary">{{name}}</p>
-                                <p class="text-text-muted text-xs">{{desc}}</p>
-                            </div>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-
-                <!-- Quick Tips Card -->
-                <div class="card p-5">
-                    <h3 class="font-semibold text-text-primary mb-4 flex items-center gap-2">
-                        <i data-lucide="lightbulb" class="w-5 h-5 text-brand-amber"></i>
-                        Pro Tips
-                    </h3>
-                    <ul class="space-y-3 text-sm text-text-secondary">
-                        <li class="flex items-start gap-2">
-                            <i data-lucide="check" class="w-4 h-4 text-brand-emerald flex-shrink-0 mt-0.5"></i>
-                            Include the full job description — responsibilities, requirements, benefits
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <i data-lucide="check" class="w-4 h-4 text-brand-emerald flex-shrink-0 mt-0.5"></i>
-                            Add recruiter email — corporate domains score higher
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <i data-lucide="check" class="w-4 h-4 text-brand-emerald flex-shrink-0 mt-0.5"></i>
-                            Paste salary info — unrealistic pay is a major red flag
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <i data-lucide="check" class="w-4 h-4 text-brand-emerald flex-shrink-0 mt-0.5"></i>
-                            Use URL extraction for LinkedIn/Naukri — gets structured data automatically
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Red Flags Quick Ref -->
-                <div class="card p-5">
-                    <h3 class="font-semibold text-text-primary mb-4 flex items-center gap-2">
-                        <i data-lucide="alert-triangle" class="w-5 h-5 text-brand-red"></i>
-                        Top Red Flags
-                    </h3>
-                    <ul class="space-y-2 text-sm">
-                        {% set flags = [
-                            ("Upfront payment requests", "red"),
-                            ("Aadhaar/PAN/bank details upfront", "red"),
-                            ("WhatsApp/Telegram only contact", "amber"),
-                            ("Personal email (Gmail, Yahoo)", "amber"),
-                            ("Urgency pressure tactics", "amber"),
-                            ("Too-good-to-be-true salary", "red"),
-                            ("Vague job description", "amber"),
-                            ("Newly registered domain", "amber"),
-                        ] %}
-                        {% for flag, color in flags %}
-                        <li class="flex items-center gap-2">
-                            <span class="w-1.5 h-1.5 rounded-full bg-brand-{{color}}"></span>
-                            <span class="text-text-secondary">{{flag}}</span>
-                        </li>
-                        {% endfor %}
-                    </ul>
+            <!-- Result Container -->
+            <div id="result-container" class="space-y-6">
+                <!-- Results will be injected here via HTMX -->
+                <div class="card p-8 text-center" id="empty-state">
+                    <i data-lucide="search" class="w-16 h-16 text-text-muted mx-auto mb-4"></i>
+                    <h3 class="text-lg font-semibold text-text-primary mb-2">No results yet</h3>
+                    <p class="text-text-secondary">Fill in the job details and click "Scan Job Posting" to see the analysis.</p>
                 </div>
             </div>
         </div>
+
+        <!-- Right Panel: Info & Tips -->
+        <div class="space-y-6 lg:sticky lg:top-24">
+            <!-- Detection Layers Card -->
+            <div class="card p-5">
+                <h3 class="font-semibold text-text-primary mb-4 flex items-center gap-2">
+                    <i data-lucide="layers" class="w-5 h-5 text-brand-emerald"></i>
+                    8 Detection Layers
+                </h3>
+                <ul class="space-y-3 text-sm">
+                    {% set layers = [
+                        ("Company Authentication", "Verifies legal entity & domain ownership", "emerald"),
+                        ("Careers Page Verification", "Cross-references official listings", "emerald"),
+                        ("Recruiter Identity", "Validates email domain & affiliation", "amber"),
+                        ("Salary Benchmarking", "Compares against market rates", "amber"),
+                        ("Scam Pattern Detection", "ML detection of fee/task/identity scams", "red"),
+                        ("Contact Validation", "Verifies phone, email, channels", "amber"),
+                        ("Domain & SSL Intelligence", "Analyzes age, certs, infrastructure", "emerald"),
+                        ("Live Threat Intelligence", "Real-time scam database checks", "red"),
+                    ] %}
+                    {% for name, desc, color in layers %}
+                    <li class="flex items-start gap-3">
+                        <span class="w-2 h-2 mt-2 rounded-full bg-brand-{{color}} flex-shrink-0"></span>
+                        <div>
+                            <p class="font-medium text-text-primary">{{name}}</p>
+                            <p class="text-text-muted text-xs">{{desc}}</p>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Quick Tips Card -->
+            <div class="card p-5">
+                <h3 class="font-semibold text-text-primary mb-4 flex items-center gap-2">
+                    <i data-lucide="lightbulb" class="w-5 h-5 text-brand-amber"></i>
+                    Pro Tips
+                </h3>
+                <ul class="space-y-3 text-sm text-text-secondary">
+                    <li class="flex items-start gap-2">
+                        <i data-lucide="check" class="w-4 h-4 text-brand-emerald flex-shrink-0 mt-0.5"></i>
+                        Include the full job description — responsibilities, requirements, benefits
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i data-lucide="check" class="w-4 h-4 text-brand-emerald flex-shrink-0 mt-0.5"></i>
+                        Add recruiter email — corporate domains score higher
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i data-lucide="check" class="w-4 h-4 text-brand-emerald flex-shrink-0 mt-0.5"></i>
+                        Paste salary info — unrealistic pay is a major red flag
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i data-lucide="check" class="w-4 h-4 text-brand-emerald flex-shrink-0 mt-0.5"></i>
+                        Use URL extraction for LinkedIn/Naukri — gets structured data automatically
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Red Flags Quick Ref -->
+            <div class="card p-5">
+                <h3 class="font-semibold text-text-primary mb-4 flex items-center gap-2">
+                    <i data-lucide="alert-triangle" class="w-5 h-5 text-brand-red"></i>
+                    Top Red Flags
+                </h3>
+                <ul class="space-y-2 text-sm">
+                    {% set flags = [
+                        ("Upfront payment requests", "red"),
+                        ("Aadhaar/PAN/bank details upfront", "red"),
+                        ("WhatsApp/Telegram only contact", "amber"),
+                        ("Personal email (Gmail, Yahoo)", "amber"),
+                        ("Urgency pressure tactics", "amber"),
+                        ("Too-good-to-be-true salary", "red"),
+                        ("Vague job description", "amber"),
+                        ("Newly registered domain", "amber"),
+                    ] %}
+                    {% for flag, color in flags %}
+                    <li class="flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-brand-{{color}}"></span>
+                        <span class="text-text-secondary">{{flag}}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
     </div>
-</main>
+</div>
 
 <!-- Result Detail Modal (for full report view) -->
 <div id="result-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="modal-title">
@@ -471,20 +431,12 @@
         </div>
     </div>
 </div>
-{% endblock %}
 
 <script>
-    // Mobile menu toggle
-    document.addEventListener('DOMContentLoaded', () => {
-        const btn = document.getElementById('mobile-menu-btn');
-        const menu = document.getElementById('mobile-menu');
-        if (btn && menu) {
-            btn.addEventListener('click', () => {
-                menu.classList.toggle('hidden');
-            });
-        }
+    // Mobile menu toggle - handled by app_base.html
 
-        // Tab switching with form state preservation
+    // Tab switching with form state preservation
+    document.addEventListener('DOMContentLoaded', () => {
         const tabBtns = document.querySelectorAll('.tab-btn-scanner');
         const panels = document.querySelectorAll('.tab-panel-scanner');
         const forms = document.querySelectorAll('.tab-panel-scanner form');
@@ -508,6 +460,27 @@
                         p.classList.add('active');
                     }
                 });
+            });
+        });
+
+        // Keyboard navigation for tabs (Arrow keys)
+        tabBtns.forEach((btn, index) => {
+            btn.addEventListener('keydown', (e) => {
+                let newIndex = index;
+                if (e.key === 'ArrowRight') {
+                    newIndex = (index + 1) % tabBtns.length;
+                } else if (e.key === 'ArrowLeft') {
+                    newIndex = (index - 1 + tabBtns.length) % tabBtns.length;
+                } else if (e.key === 'Home') {
+                    newIndex = 0;
+                } else if (e.key === 'End') {
+                    newIndex = tabBtns.length - 1;
+                }
+                if (newIndex !== index) {
+                    e.preventDefault();
+                    tabBtns[newIndex].click();
+                    tabBtns[newIndex].focus();
+                }
             });
         });
 
@@ -564,15 +537,12 @@
             ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
                 dropZone.addEventListener(eventName, preventDefaults, false);
             });
-
             ['dragenter', 'dragover'].forEach(eventName => {
                 dropZone.addEventListener(eventName, highlight, false);
             });
-
             ['dragleave', 'drop'].forEach(eventName => {
                 dropZone.addEventListener(eventName, unhighlight, false);
             });
-
             dropZone.addEventListener('drop', handleDrop, false);
         }
 
@@ -730,8 +700,10 @@
         if (content) content.innerHTML = '';
     }
 </script>
+{% endblock %}
 
 {% block scripts %}
+{{ super() }}
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         if (window.lucide) lucide.createIcons();

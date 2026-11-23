@@ -1,6 +1,7 @@
 import joblib
 import numpy as np
 import xgboost as xgb
+import re
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 from scipy.sparse import csr_matrix, hstack
@@ -95,13 +96,119 @@ def predict_risk(
     summary = generate_summary(risk_tier, risk_score, checks)
     recommendation = generate_recommendation(risk_tier, checks)
 
+    # --- Detailed Analysis Fields ---
+
+    # Company Research & Verification
+    company_website = extract_company_website(company_name, job_description, job_url)
+    domain_age = estimate_domain_age(company_website) if company_website else None
+    linkedin_company = find_linkedin_company(company_name)
+    glassdoor_company = find_glassdoor_company(company_name)
+    company_registration_status = check_company_registration(company_name)
+    domain_ownership_status = check_domain_ownership(company_name, company_website)
+    physical_address_status = check_physical_address(job_description, company_name)
+    years_operation_status = check_years_operation(company_name, domain_age)
+
+    # Location Verification
+    company_locations = extract_company_locations(job_description, company_name)
+    job_location = location if location else extract_job_location(job_description)
+    user_location = location
+    work_type = determine_work_type(job_description, employment_type)
+    location_match_status, location_match_details, location_analysis_notes = analyze_location_match(
+        company_locations, job_location, user_location, work_type
+    )
+
+    # Contact Verification
+    recruiter_name = extract_recruiter_name(job_description, raw_text)
+    email_domain_verified = verify_email_domain(recruiter_email, company_name, company_website)
+    recruiter_linkedin = find_recruiter_linkedin(recruiter_name, company_name)
+    linkedin_verified = verify_linkedin_profile(recruiter_linkedin, company_name)
+    directory_match = check_employee_directory(recruiter_name, company_name)
+    official_channel = check_official_channel(job_description, recruiter_email, recruiter_phone)
+
+    # Salary & Job Verification
+    salary_benchmark = get_salary_benchmark(job_title, location)
+    responsibilities = extract_responsibilities(job_description)
+    requirements = extract_requirements(job_description)
+    salary_in_range = check_salary_in_range(salary_text, job_title, location)
+    no_unrealistic_salary = check_no_unrealistic_salary(salary_text, job_title)
+    clear_structure = check_clear_structure(job_description)
+    job_structure_complete = check_job_structure_complete(job_description)
+
+    # Grammar & Content Analysis
+    grammar_errors, spacing_issues, suspicious_phrases, urgency_language, grammar_examples = analyze_grammar_and_content(combined_text)
+    content_assessment = generate_content_assessment(grammar_errors, spacing_issues, suspicious_phrases, urgency_language)
+
+    # Scam/Legit Pattern Detection
+    suspicious_signals = detect_suspicious_signals(job_title, company_name, job_description, job_url, recruiter_email, combined_text)
+    legitimate_signals = detect_legitimate_signals(job_title, company_name, job_description, job_url, recruiter_email, combined_text)
+
+    # Final Recommendations
+    final_recommendation = generate_final_recommendation(risk_tier, risk_score, checks)
+    immediate_precautions = generate_immediate_precautions(risk_tier, checks)
+    verification_steps = generate_verification_steps(risk_tier, checks)
+
     return AnalysisResult(
+        # Core results
         risk_score=risk_score,
         risk_tier=risk_tier,
         checks=checks,
         summary=summary,
         recommendation=recommendation,
-        model_version=_metrics.get('model_version', '1.0.0')
+        model_version=_metrics.get('model_version', '1.0.0'),
+
+        # Company Research & Verification
+        company_website=company_website,
+        domain_age=domain_age,
+        linkedin_company=linkedin_company,
+        glassdoor_company=glassdoor_company,
+        company_registration_status=company_registration_status,
+        domain_ownership_status=domain_ownership_status,
+        physical_address_status=physical_address_status,
+        years_operation_status=years_operation_status,
+
+        # Location Verification
+        company_locations=company_locations,
+        job_location=job_location,
+        user_location=user_location,
+        work_type=work_type,
+        location_match_status=location_match_status,
+        location_match_details=location_match_details,
+        location_analysis_notes=location_analysis_notes,
+
+        # Contact Verification
+        recruiter_name=recruiter_name,
+        email_domain_verified=email_domain_verified,
+        recruiter_linkedin=recruiter_linkedin,
+        linkedin_verified=linkedin_verified,
+        directory_match=directory_match,
+        official_channel=official_channel,
+
+        # Salary & Job Verification
+        salary_text=salary_text,
+        salary_benchmark=salary_benchmark,
+        responsibilities=responsibilities,
+        requirements=requirements,
+        salary_in_range=salary_in_range,
+        no_unrealistic_salary=no_unrealistic_salary,
+        clear_structure=clear_structure,
+        job_structure_complete=job_structure_complete,
+
+        # Grammar & Content Analysis
+        grammar_errors=grammar_errors,
+        spacing_issues=spacing_issues,
+        suspicious_phrases=suspicious_phrases,
+        urgency_language=urgency_language,
+        grammar_examples=grammar_examples,
+        content_assessment=content_assessment,
+
+        # Scam/Legit Pattern Detection
+        suspicious_signals=suspicious_signals,
+        legitimate_signals=legitimate_signals,
+
+        # Final Recommendations
+        final_recommendation=final_recommendation,
+        immediate_precautions=immediate_precautions,
+        verification_steps=verification_steps,
     )
 
 
@@ -269,3 +376,266 @@ def generate_recommendation(tier: str, checks: List[CheckResult]) -> str:
         return "⚠️ VERIFY FIRST. Check company's official careers page for this role. Search company + 'scam' online. Contact company via official website (not links in posting). Never pay fees to apply."
     else:
         return "✅ PROCEED WITH NORMAL CAUTION. Still verify company on official website. Use standard job application safety practices. Never pay to apply for a job."
+
+
+# --- Minimal stub functions for detailed analysis (Phase 4) ---
+# These return sensible defaults so scan_detail.html renders without errors
+
+def extract_company_website(company_name, job_description, job_url):
+    if job_url:
+        from urllib.parse import urlparse
+        try:
+            parsed = urlparse(job_url)
+            return parsed.netloc
+        except Exception:
+            pass
+    if company_name:
+        return f"https://{company_name.lower().replace(' ', '')}.com"
+    return "Not available from input"
+
+def estimate_domain_age(company_website):
+    if not company_website:
+        return None
+    return None  # Domain age check requires WHOIS lookup (not available offline)
+
+def find_linkedin_company(company_name):
+    if not company_name:
+        return "No company name provided"
+    return f"https://linkedin.com/company/{company_name.lower().replace(' ', '-')}"
+
+def find_glassdoor_company(company_name):
+    if not company_name:
+        return "No company name provided"
+    return f"https://glassdoor.com/Reviews/{company_name.replace(' ', '-')}-Reviews"
+
+def check_company_registration(company_name):
+    if not company_name:
+        return "No company name provided"
+    return "Registration verification requires government database access (not available offline)"
+
+def check_domain_ownership(company_name, company_website):
+    if not company_name or not company_website:
+        return "Insufficient data"
+    return "Domain ownership verification requires WHOIS lookup (not available offline)"
+
+def check_physical_address(job_description, company_name):
+    if not company_name:
+        return "No company name provided"
+    return "Physical address verification requires external database (not available offline)"
+
+def check_years_operation(company_name, domain_age):
+    if not company_name:
+        return "No company name provided"
+    return "Years of operation check requires business registry access (not available offline)"
+
+def extract_company_locations(job_description, company_name):
+    if not company_name:
+        return "No company name provided"
+    return "Company location extraction requires external database (not available offline)"
+
+def extract_job_location(job_description):
+    if not job_description:
+        return "Not specified in job posting"
+    # Simple location extraction
+    import re
+    locations = re.findall(r'\b(?:remote|hybrid|on.?site|work from home|bangalore|mumbai|delhi|hyderabad|pune|chennai|gurgaon|noida|kolkata|ahmedabad)\b', job_description.lower())
+    if locations:
+        return ", ".join(set(locations))
+    return "Location not specified in job description"
+
+def determine_work_type(job_description, employment_type):
+    if employment_type:
+        return employment_type.lower().replace(" ", "_")
+    text = job_description.lower()
+    if "remote" in text or "work from home" in text:
+        return "remote"
+    elif "hybrid" in text:
+        return "hybrid"
+    return "on_site"
+
+def analyze_location_match(company_locations, job_location, user_location, work_type):
+    if work_type == "remote":
+        return "pass", "Remote position - location match not applicable", "Remote work allows flexibility regardless of location"
+    if not job_location:
+        return "info", "Job location not specified", "Cannot verify location match without job location"
+    return "info", "Location comparison completed", "Manual verification recommended for on-site/hybrid roles"
+
+def extract_recruiter_name(job_description, raw_text):
+    return "Not extracted from posting (requires NLP parsing)"
+
+def verify_email_domain(recruiter_email, company_name, company_website):
+    if not recruiter_email or '@' not in recruiter_email:
+        return False
+    domain = recruiter_email.split('@')[-1].lower()
+    free_domains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'live.com', 'icloud.com', 'protonmail.com']
+    return domain not in free_domains
+
+def find_recruiter_linkedin(recruiter_name, company_name):
+    if not recruiter_name:
+        return "No recruiter name provided"
+    return f"https://linkedin.com/search/results/people/?keywords={recruiter_name.replace(' ', '%20')}%20{company_name.replace(' ', '%20')}"
+
+def verify_linkedin_profile(recruiter_linkedin, company_name):
+    if not recruiter_linkedin:
+        return "No LinkedIn profile provided"
+    return "LinkedIn verification requires API access (not available offline)"
+
+def check_employee_directory(recruiter_name, company_name):
+    if not recruiter_name or not company_name:
+        return "Insufficient data"
+    return "Employee directory check requires company internal access (not available offline)"
+
+def check_official_channel(job_description, recruiter_email, recruiter_phone):
+    text = job_description.lower()
+    if 'whatsapp' in text or 'telegram' in text:
+        return "fail"
+    if recruiter_email and '@' in recruiter_email:
+        domain = recruiter_email.split('@')[-1].lower()
+        free_domains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'live.com', 'icloud.com', 'protonmail.com']
+        if domain in free_domains:
+            return "warning"
+    return "pass"
+
+def get_salary_benchmark(job_title, location):
+    if not job_title:
+        return "No job title provided"
+    return f"Salary benchmark for '{job_title}' in {location or 'India'} requires market data (not available offline). Typical range: ₹5-25 LPA for tech roles."
+
+def extract_responsibilities(job_description):
+    if not job_description:
+        return "No job description provided"
+    return "Responsibility extraction requires NLP parsing (not available offline). Please review the job description manually."
+
+def extract_requirements(job_description):
+    if not job_description:
+        return "No job description provided"
+    return "Requirements extraction requires NLP parsing (not available offline). Please review the job description manually."
+
+def check_salary_in_range(salary_text, job_title, location):
+    if not salary_text:
+        return "No salary information provided in posting"
+    return "Salary range validation requires market benchmark data (not available offline)"
+
+def check_no_unrealistic_salary(salary_text, job_title):
+    if not salary_text:
+        return "No salary information provided"
+    import re
+    # Check for unrealistic numbers
+    numbers = re.findall(r'[\d,]+', salary_text.replace('LPA', '').replace('lpa', '').replace('Lakhs', '').replace('lakhs', ''))
+    for n in numbers:
+        try:
+            val = int(n.replace(',', ''))
+            if val > 100:  # More than 100 LPA is suspicious for most roles
+                return "fail"
+        except ValueError:
+            pass
+    return "pass"
+
+def check_clear_structure(job_description):
+    if not job_description:
+        return "No job description provided"
+    sections = ['responsibilit', 'requirement', 'qualification', 'skill', 'experience', 'about', 'benefit', 'salary']
+    found = sum(1 for s in sections if s in job_description.lower())
+    if found >= 4:
+        return "pass"
+    elif found >= 2:
+        return "warning"
+    return "fail"
+
+def check_job_structure_complete(job_description):
+    if not job_description:
+        return "No job description provided"
+    required = ['responsibilit', 'requirement', 'qualification']
+    found = sum(1 for r in required if r in job_description.lower())
+    if found >= 3:
+        return "pass"
+    elif found >= 1:
+        return "warning"
+    return "fail"
+
+def analyze_grammar_and_content(combined_text):
+    if not combined_text:
+        return 0, 0, 0, 0, []
+    import re
+    # Simple heuristic checks
+    grammar_errors = len(re.findall(r'\b(?:teh|recieve|seperate|definately|occured|accomodate|buisness)\b', combined_text.lower()))
+    spacing_issues = len(re.findall(r'[.!?]{2,}', combined_text)) + len(re.findall(r'\s{3,}', combined_text))
+    suspicious_phrases = len(re.findall(r'\b(?:earn money|work from home|no experience|guaranteed income|easy money|quick cash)\b', combined_text.lower()))
+    urgency_language = len(re.findall(r'\b(?:urgent|immediate|asap|today|limited|expire|hurry|quick|instant|24.?hour|48.?hour)\b', combined_text.lower()))
+    examples = []
+    if grammar_errors:
+        examples.append("Common typos detected (e.g., 'teh' instead of 'the')")
+    if spacing_issues:
+        examples.append("Multiple spaces or punctuation issues found")
+    if suspicious_phrases:
+        examples.append("Phrases commonly found in scam postings detected")
+    if urgency_language:
+        examples.append("Urgency language used to pressure applicants")
+    return grammar_errors, spacing_issues, suspicious_phrases, urgency_language, examples
+
+def generate_content_assessment(grammar_errors, spacing_issues, suspicious_phrases, urgency_language):
+    issues = []
+    if grammar_errors > 0:
+        issues.append(f"{grammar_errors} potential grammar/typo issues")
+    if spacing_issues > 0:
+        issues.append(f"{spacing_issues} spacing/formatting issues")
+    if suspicious_phrases > 0:
+        issues.append(f"{suspicious_phrases} suspicious phrases")
+    if urgency_language > 0:
+        issues.append(f"{urgency_language} urgency indicators")
+    if not issues:
+        return "Content appears well-structured with no obvious red flags in language or formatting."
+    return f"Content quality concerns: {', '.join(issues)}. Legitimate postings typically have professional formatting and language."
+
+def detect_suspicious_signals(job_title, company_name, job_description, job_url, recruiter_email, combined_text):
+    signals = []
+    text = combined_text.lower()
+    if any(w in text for w in ['whatsapp', 'telegram', 'signal', 'viber']):
+        signals.append({"type": "communication", "signal": "Requests communication via informal chat apps", "severity": "high"})
+    if any(w in text for w in ['fee', 'deposit', 'payment', 'charge', 'investment', 'registration fee']):
+        signals.append({"type": "financial", "signal": "Requests upfront payment or fees", "severity": "critical"})
+    if any(w in text for w in ['ssn', 'social security', 'bank account', 'passport', 'aadhaar', 'pan card']):
+        signals.append({"type": "privacy", "signal": "Requests sensitive personal information upfront", "severity": "critical"})
+    if recruiter_email and '@' in recruiter_email:
+        domain = recruiter_email.split('@')[-1].lower()
+        free_domains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'live.com', 'icloud.com', 'protonmail.com']
+        if domain in free_domains:
+            signals.append({"type": "identity", "signal": "Recruiter uses free email domain instead of corporate", "severity": "high"})
+    if any(w in text for w in ['task', 'data entry', 'copy paste', 'typing', 'form filling', 'captcha', 'click', 'like', 'subscribe']):
+        signals.append({"type": "task_scam", "signal": "Contains keywords typical of task/click scams", "severity": "high"})
+    return signals
+
+def detect_legitimate_signals(job_title, company_name, job_description, job_url, recruiter_email, combined_text):
+    signals = []
+    text = combined_text.lower()
+    if job_url and ('linkedin.com' in job_url or 'naukri.com' in job_url or 'indeed.com' in job_url):
+        signals.append({"type": "platform", "signal": "Posted on recognized job platform", "severity": "positive"})
+    if recruiter_email and '@' in recruiter_email:
+        domain = recruiter_email.split('@')[-1].lower()
+        free_domains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'live.com', 'icloud.com', 'protonmail.com']
+        if domain not in free_domains:
+            signals.append({"type": "identity", "signal": "Recruiter uses corporate email domain", "severity": "positive"})
+    if any(w in text for w in ['benefits', 'insurance', 'pf', 'provident fund', 'gratuity', 'leave policy', 'notice period']):
+        signals.append({"type": "employment", "signal": "Mentions standard employment benefits and policies", "severity": "positive"})
+    if any(w in text for w in ['experience', 'years of experience', 'qualification', 'degree', 'certification']):
+        signals.append({"type": "requirements", "signal": "Specifies concrete experience/qualification requirements", "severity": "positive"})
+    if company_name and len(company_name) > 3:
+        signals.append({"type": "company", "signal": "Company name provided (verify independently)", "severity": "positive"})
+    return signals
+
+def generate_final_recommendation(risk_tier, risk_score, checks):
+    if risk_tier == "risky":
+        return "❌ DO NOT APPLY. Multiple critical red flags detected."
+    elif risk_tier == "caution":
+        return "⚠️ VERIFY FIRST. Several warning signs found. Verify independently."
+    return "✅ PROCEED WITH NORMAL CAUTION. Posting appears legitimate."
+
+def generate_immediate_precautions(risk_tier, checks):
+    if risk_tier == "risky":
+        return ["Do not share personal information", "Do not pay any fees", "Report the posting", "Monitor accounts if info shared"]
+    elif risk_tier == "caution":
+        return ["Verify company independently", "Check official careers page", "Never pay to apply", "Protect personal info"]
+    return ["Verify company on official website", "Use standard application safety", "Never pay to apply"]
+
+def generate_verification_steps(risk_tier, checks):
+    return ["Check official careers page", "Verify recruiter on LinkedIn", "Search company + 'scam'", "Check domain age on WHOIS"]

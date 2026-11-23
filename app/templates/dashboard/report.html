@@ -1,219 +1,313 @@
-{% extends "base.html" %}
+{% extends "app_base.html" %}
 
 {% block title %}Report a Scam — ScamGraph{% endblock %}
 
-{% block content %}
-<!-- Navigation Bar -->
-<nav class="fixed top-0 left-0 right-0 z-50 bg-bg-secondary/80 backdrop-blur-md border-b border-surface-border">
-    <div class="max-w-7xl mx-auto px-4">
-        <div class="flex items-center justify-between h-16">
-            <a href="/" class="flex items-center gap-2" aria-label="ScamGraph Home">
-                <div class="w-8 h-8 rounded-lg bg-brand-emerald flex items-center justify-center">
-                    <i data-lucide="shield-check" class="w-5 h-5 text-white"></i>
-                </div>
-                <span class="font-bold text-xl text-text-primary">ScamGraph</span>
+{% block app_content %}
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex items-center gap-3 mb-4">
+            <a href="/dashboard" class="btn-ghost p-2">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
             </a>
-            <div class="hidden md:flex items-center gap-4">
-                <a href="/dashboard" class="btn-ghost px-4 py-2 text-sm">Dashboard</a>
-                <a href="/scanner" class="btn-primary px-5 py-2 text-sm">
-                    <i data-lucide="search" class="w-4 h-4"></i>
-                    New Scan
-                </a>
+            <div>
+                <h1 class="text-2xl font-bold text-text-primary">Report a Scam</h1>
+                <p class="text-text-secondary">Help protect the community by reporting suspicious job postings</p>
             </div>
         </div>
     </div>
-</nav>
 
-<!-- Report Page -->
-<div class="pt-20 min-h-screen pb-12">
-    <div class="max-w-3xl mx-auto px-4">
-        <!-- Header -->
-        <div class="mb-8">
-            <div class="flex items-center gap-3 mb-4">
-                <a href="/dashboard" class="btn-ghost p-2">
-                    <i data-lucide="arrow-left" class="w-5 h-5"></i>
-                </a>
-                <div>
-                    <h1 class="text-2xl font-bold text-text-primary">Report a Scam</h1>
-                    <p class="text-text-secondary">Help protect the community by reporting suspicious job postings</p>
-                </div>
+    {% if success %}
+    <div class="card p-6 mb-6 bg-brand-emeraldLight border-brand-emerald/30 animate-slide-down">
+        <div class="flex items-center gap-3">
+            <i data-lucide="check-circle" class="w-6 h-6 text-brand-emerald flex-shrink-0"></i>
+            <div>
+                <p class="font-semibold text-brand-emerald">Report Submitted Successfully</p>
+                <p class="text-sm text-text-secondary">{{ success }}</p>
             </div>
         </div>
+    </div>
+    {% endif %}
 
-        {% if success %}
-        <div class="card p-6 mb-6 bg-brand-emeraldLight border-brand-emerald/30">
-            <div class="flex items-center gap-3">
-                <i data-lucide="check-circle" class="w-6 h-6 text-brand-emerald flex-shrink-0"></i>
-                <div>
-                    <p class="font-semibold text-brand-emerald">Report Submitted</p>
-                    <p class="text-sm text-text-secondary">{{ success }}</p>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-
-        <div class="card p-6">
-            <form method="POST" action="/dashboard/report" class="space-y-6">
-                <!-- Job Details -->
-                <fieldset>
-                    <legend class="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
-                        <i data-lucide="file-text" class="w-5 h-5 text-brand-emerald"></i>
-                        Job Posting Details
-                    </legend>
-                    <div class="space-y-4">
-                        <div>
-                            <label for="job_title" class="block text-sm font-medium text-text-secondary mb-1">Job Title *</label>
-                            <input type="text" name="job_title" id="job_title" required
-                                placeholder="e.g., Urgent Data Entry Operator"
-                                class="input-field">
-                        </div>
-                        <div>
-                            <label for="company_name" class="block text-sm font-medium text-text-secondary mb-1">Company Name *</label>
-                            <input type="text" name="company_name" id="company_name" required
-                                placeholder="e.g., QuickCash Global"
-                                class="input-field">
-                        </div>
-                        <div>
-                            <label for="job_url" class="block text-sm font-medium text-text-secondary mb-1">Job Posting URL</label>
-                            <input type="url" name="job_url" id="job_url"
-                                placeholder="https://linkedin.com/jobs/view/... or https://naukri.com/..."
-                                class="input-field">
-                        </div>
-                    </div>
-                </fieldset>
-
-                <!-- Scam Details -->
-                <fieldset>
-                    <legend class="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
-                        <i data-lucide="alert-triangle" class="w-5 h-5 text-brand-red"></i>
-                        Scam Details
-                    </legend>
-                    <div class="space-y-4">
-                        <div>
-                            <label for="scam_type" class="block text-sm font-medium text-text-secondary mb-1">Type of Scam *</label>
-                            <select name="scam_type" id="scam_type" required class="input-field">
-                                <option value="">Select scam type</option>
-                                <option value="task_scam">Task Scam (click, like, captcha, form-filling)</option>
-                                <option value="advance_fee">Advance Fee Fraud (registration, training, visa fees)</option>
-                                <option value="identity_theft">Identity Theft (Aadhaar, PAN, bank details collection)</option>
-                                <option value="money_mule">Money Mule (receive/forward funds)</option>
-                                <option value="reshipping">Reshipping Scam (receive/re-ship packages)</option>
-                                <option value="fake_check">Fake Check Scam (sent check, asked to refund)</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="contact_method" class="block text-sm font-medium text-text-secondary mb-1">Contact Method Used</label>
-                            <select name="contact_method" id="contact_method" class="input-field">
-                                <option value="">Select contact method</option>
-                                <option value="whatsapp">WhatsApp</option>
-                                <option value="telegram">Telegram</option>
-                                <option value="email_personal">Personal Email (Gmail, Yahoo, etc.)</option>
-                                <option value="email_corporate">Corporate Email</option>
-                                <option value="phone">Phone Call/SMS</option>
-                                <option value="linkedin">LinkedIn Message</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="amount_lost" class="block text-sm font-medium text-text-secondary mb-1">Amount Lost (if any)</label>
-                            <input type="text" name="amount_lost" id="amount_lost"
-                                placeholder="e.g., ₹2,500 or $0 if no money lost"
-                                class="input-field">
-                        </div>
-                    </div>
-                </fieldset>
-
-                <!-- Description -->
-                <fieldset>
-                    <legend class="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
-                        <i data-lucide="message-square" class="w-5 h-5 text-brand-amber"></i>
-                        What Happened?
-                    </legend>
+    <div class="card p-6">
+        <form method="POST" action="/dashboard/report" class="space-y-6" enctype="multipart/form-data" id="report-form">
+            <!-- Job Details -->
+            <fieldset>
+                <legend class="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
+                    <i data-lucide="file-text" class="w-5 h-5 text-brand-emerald"></i>
+                    Job Posting Details
+                </legend>
+                <div class="space-y-4">
                     <div>
-                        <label for="description" class="block text-sm font-medium text-text-secondary mb-1">Describe the scam in detail *</label>
-                        <textarea name="description" id="description" required rows="6"
-                            placeholder="Please describe what happened: how you were contacted, what they asked you to do, any red flags you noticed, money lost, etc."
-                            class="input-field font-mono text-sm"></textarea>
-                        <p class="mt-1 text-xs text-text-muted">Include as much detail as possible - this helps others avoid the same scam.</p>
+                        <label for="job_title" class="block text-sm font-medium text-text-secondary mb-1">Job Title *</label>
+                        <input type="text" name="job_title" id="job_title" required
+                            placeholder="e.g., Urgent Data Entry Operator"
+                            class="input-field" autocomplete="off">
                     </div>
-                </fieldset>
+                    <div>
+                        <label for="company_name" class="block text-sm font-medium text-text-secondary mb-1">Company Name *</label>
+                        <input type="text" name="company_name" id="company_name" required
+                            placeholder="e.g., QuickCash Global"
+                            class="input-field" autocomplete="off">
+                    </div>
+                    <div>
+                        <label for="job_url" class="block text-sm font-medium text-text-secondary mb-1">Job Posting URL</label>
+                        <input type="url" name="job_url" id="job_url"
+                            placeholder="https://linkedin.com/jobs/view/... or https://naukri.com/..."
+                            class="input-field" autocomplete="url">
+                    </div>
+                </div>
+            </fieldset>
 
-                <!-- Evidence Upload (optional) -->
-                <fieldset>
-                    <legend class="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
-                        <i data-lucide="image" class="w-5 h-5 text-brand-blue"></i>
-                        Evidence (Optional)
-                    </legend>
-                    <div class="border-2 border-dashed border-surface-border rounded-xl p-6 text-center hover:border-brand-emerald/50 transition-colors">
-                        <input type="file" name="evidence" id="evidence" accept="image/png,image/jpeg,image/jpg,image/webp,application/pdf"
-                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" style="z-index: 10;">
+            <!-- Scam Details -->
+            <fieldset>
+                <legend class="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
+                    <i data-lucide="alert-triangle" class="w-5 h-5 text-brand-red"></i>
+                    Scam Details
+                </legend>
+                <div class="space-y-4">
+                    <div>
+                        <label for="scam_type" class="block text-sm font-medium text-text-secondary mb-1">Type of Scam *</label>
+                        <select name="scam_type" id="scam_type" required class="input-field">
+                            <option value="">Select scam type</option>
+                            <option value="task_scam">Task Scam (click, like, captcha, form-filling)</option>
+                            <option value="advance_fee">Advance Fee Fraud (registration, training, visa fees)</option>
+                            <option value="identity_theft">Identity Theft (Aadhaar, PAN, bank details collection)</option>
+                            <option value="money_mule">Money Mule (receive/forward funds)</option>
+                            <option value="reshipping">Reshipping Scam (receive/re-ship packages)</option>
+                            <option value="fake_check">Fake Check Scam (sent check, asked to refund)</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="contact_method" class="block text-sm font-medium text-text-secondary mb-1">Contact Method Used</label>
+                        <select name="contact_method" id="contact_method" class="input-field">
+                            <option value="">Select contact method</option>
+                            <option value="whatsapp">WhatsApp</option>
+                            <option value="telegram">Telegram</option>
+                            <option value="email_personal">Personal Email (Gmail, Yahoo, etc.)</option>
+                            <option value="email_corporate">Corporate Email</option>
+                            <option value="phone">Phone Call/SMS</option>
+                            <option value="linkedin">LinkedIn Message</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="amount_lost" class="block text-sm font-medium text-text-secondary mb-1">Amount Lost (if any)</label>
+                        <input type="text" name="amount_lost" id="amount_lost"
+                            placeholder="e.g., ₹2,500 or $0 if no money lost"
+                            class="input-field" autocomplete="off">
+                    </div>
+                </div>
+            </fieldset>
+
+            <!-- Description -->
+            <fieldset>
+                <legend class="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
+                    <i data-lucide="message-square" class="w-5 h-5 text-brand-amber"></i>
+                    What Happened?
+                </legend>
+                <div>
+                    <label for="description" class="block text-sm font-medium text-text-secondary mb-1">Describe the scam in detail *</label>
+                    <textarea name="description" id="description" required rows="6"
+                        placeholder="Please describe what happened: how you were contacted, what they asked you to do, any red flags you noticed, money lost, etc."
+                        class="input-field font-mono text-sm"></textarea>
+                    <p class="mt-1 text-xs text-text-muted">Include as much detail as possible - this helps others avoid the same scam.</p>
+                </div>
+            </fieldset>
+
+            <!-- Evidence Upload (optional) -->
+            <fieldset>
+                <legend class="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
+                    <i data-lucide="image" class="w-5 h-5 text-brand-blue"></i>
+                    Evidence (Optional)
+                </legend>
+                <div class="border-2 border-dashed border-surface-border rounded-xl p-6 text-center hover:border-brand-emerald/50 transition-colors relative" id="drop-zone">
+                    <input type="file" name="evidence" id="evidence" accept="image/png,image/jpeg,image/jpg,image/webp,application/pdf"
+                        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" style="z-index: 10;" multiple>
+                    <div id="drop-content">
                         <i data-lucide="upload" class="w-12 h-12 text-text-muted mx-auto mb-3"></i>
                         <p class="text-text-secondary mb-1">Drag & drop screenshots, chat logs, or documents</p>
-                        <p class="text-sm text-text-muted mb-4">or click to browse (PNG, JPG, PDF up to 10MB)</p>
+                        <p class="text-sm text-text-muted mb-4">or click to browse (PNG, JPG, PDF up to 10MB each)</p>
                         <button type="button" class="btn-secondary" onclick="document.getElementById('evidence').click()">
                             <i data-lucide="folder-open" class="w-5 h-5 mr-2"></i>
                             Choose Files
                         </button>
                     </div>
-                </fieldset>
-
-                <!-- Submit -->
-                <div class="pt-4 border-t border-surface-border">
-                    <button type="submit" class="btn-primary w-full justify-center py-3">
-                        <i data-lucide="flag" class="w-5 h-5"></i>
-                        Submit Report
-                    </button>
+                    <div id="file-previews" class="hidden mt-4 space-y-2"></div>
                 </div>
-            </form>
+            </fieldset>
 
-            <div class="mt-6 pt-6 border-t border-surface-border">
-                <p class="text-sm text-text-muted text-center">
-                    <i data-lucide="info" class="w-4 h-4 inline mr-1"></i>
-                    Reports are reviewed by our team and added to the community database.
-                    Your personal information is kept confidential.
-                </p>
+            <!-- Submit -->
+            <div class="pt-4 border-t border-surface-border">
+                <button type="submit" class="btn-primary w-full justify-center py-3" id="submit-btn">
+                    <i data-lucide="flag" class="w-5 h-5"></i>
+                    Submit Report
+                </button>
             </div>
-        </div>
+        </form>
 
-        <!-- Quick Report Tips -->
-        <div class="mt-8 card p-6">
-            <h3 class="font-semibold text-text-primary mb-4 flex items-center gap-2">
-                <i data-lucide="lightbulb" class="w-5 h-5 text-brand-amber"></i>
-                What Makes a Good Report
-            </h3>
-            <ul class="space-y-3 text-sm text-text-secondary">
-                <li class="flex items-start gap-2">
-                    <i data-lucide="check" class="w-4 h-4 text-brand-emerald flex-shrink-0 mt-0.5"></i>
-                    Include the exact job title and company name as shown in the posting
-                </li>
-                <li class="flex items-start gap-2">
-                    <i data-lucide="check" class="w-4 h-4 text-brand-emerald flex-shrink-0 mt-0.5"></i>
-                    Provide the direct URL to the job posting if possible
-                </li>
-                <li class="flex items-start gap-2">
-                    <i data-lucide="check" class="w-4 h-4 text-brand-emerald flex-shrink-0 mt-0.5"></i>
-                    Screenshot the conversation (WhatsApp, Telegram, Email) - redact personal info
-                </li>
-                <li class="flex items-start gap-2">
-                    <i data-lucide="check" class="w-4 h-4 text-brand-emerald flex-shrink-0 mt-0.5"></i>
-                    Note any payments requested or personal info asked for
-                </li>
-                <li class="flex items-start gap-2">
-                    <i data-lucide="check" class="w-4 h-4 text-brand-emerald flex-shrink-0 mt-0.5"></i>
-                    Describe the communication pattern (urgency, chat apps only, etc.)
-                </li>
-            </ul>
+        <div class="mt-6 pt-6 border-t border-surface-border">
+            <p class="text-sm text-text-muted text-center">
+                <i data-lucide="info" class="w-4 h-4 inline mr-1"></i>
+                Reports are reviewed by our team and added to the community database.
+                Your personal information is kept confidential.
+            </p>
+        </div>
+    </div>
+
+    <!-- Quick Report Tips -->
+    <div class="mt-8 card p-6">
+        <h3 class="font-semibold text-text-primary mb-4 flex items-center gap-2">
+            <i data-lucide="lightbulb" class="w-5 h-5 text-brand-amber"></i>
+            What Makes a Good Report
+        </h3>
+        <ul class="space-y-3 text-sm text-text-secondary">
+            <li class="flex items-start gap-2">
+                <i data-lucide="check" class="w-4 h-4 text-brand-emerald flex-shrink-0 mt-0.5"></i>
+                Include the exact job title and company name as shown in the posting
+            </li>
+            <li class="flex items-start gap-2">
+                <i data-lucide="check" class="w-4 h-4 text-brand-emerald flex-shrink-0 mt-0.5"></i>
+                Provide the direct URL to the job posting if possible
+            </li>
+            <li class="flex items-start gap-2">
+                <i data-lucide="check" class="w-4 h-4 text-brand-emerald flex-shrink-0 mt-0.5"></i>
+                Screenshot the conversation (WhatsApp, Telegram, Email) - redact personal info
+            </li>
+            <li class="flex items-start gap-2">
+                <i data-lucide="check" class="w-4 h-4 text-brand-emerald flex-shrink-0 mt-0.5"></i>
+                Note any payments requested or personal info asked for
+            </li>
+            <li class="flex items-start gap-2">
+                <i data-lucide="check" class="w-4 h-4 text-brand-emerald flex-shrink-0 mt-0.5"></i>
+                Describe the communication pattern (urgency, chat apps only, etc.)
+            </li>
+        </ul>
+    </div>
+
+    <!-- Recent Community Reports (placeholder for future) -->
+    <div class="mt-8 card p-6">
+        <h3 class="font-semibold text-text-primary mb-4 flex items-center gap-2">
+            <i data-lucide="users" class="w-5 h-5 text-brand-blue"></i>
+            Community Reports
+        </h3>
+        <div class="text-center py-8">
+            <i data-lucide="shield-check" class="w-12 h-12 text-brand-emerald/30 mx-auto mb-3"></i>
+            <p class="text-text-secondary mb-2">Community reports coming soon</p>
+            <p class="text-sm text-text-muted">Verified scam reports from the community will appear here</p>
         </div>
     </div>
 </div>
-
 {% endblock %}
 
 {% block scripts %}
+{{ super() }}
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         if (window.lucide) lucide.createIcons();
+
+        // Drag & drop file handling
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('evidence');
+        const dropContent = document.getElementById('drop-content');
+        const filePreviews = document.getElementById('file-previews');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+            dropZone.classList.add('border-brand-emerald', 'bg-brand-emeraldLight/10');
+        }
+
+        function unhighlight() {
+            dropZone.classList.remove('border-brand-emerald', 'bg-brand-emeraldLight/10');
+        }
+
+        dropZone.addEventListener('drop', handleDrop, false);
+        fileInput.addEventListener('change', handleFiles, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles({ target: { files } });
+        }
+
+        function handleFiles(e) {
+            const files = Array.from(e.target.files);
+            if (files.length === 0) return;
+
+            filePreviews.classList.remove('hidden');
+            dropContent.classList.add('hidden');
+
+            files.forEach(file => {
+                // Validate file
+                const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'application/pdf'];
+                const maxSize = 10 * 1024 * 1024; // 10MB
+
+                if (!validTypes.includes(file.type)) {
+                    alert(`Invalid file type: ${file.name}. Please use PNG, JPG, WebP, or PDF.`);
+                    return;
+                }
+                if (file.size > maxSize) {
+                    alert(`File too large: ${file.name}. Max size is 10MB.`);
+                    return;
+                }
+
+                // Create preview
+                const preview = document.createElement('div');
+                preview.className = 'flex items-center gap-3 p-3 bg-surface-tertiary border border-surface-border rounded-lg animate-fade-in';
+
+                let icon = 'file';
+                if (file.type.startsWith('image/')) icon = 'image';
+                else if (file.type === 'application/pdf') icon = 'file-text';
+
+                preview.innerHTML = `
+                    <i data-lucide="${icon}" class="w-6 h-6 text-brand-emerald flex-shrink-0"></i>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-medium text-text-primary truncate">${file.name}</p>
+                        <p class="text-sm text-text-muted">${(file.size / 1024).toFixed(1)} KB</p>
+                    </div>
+                    <button type="button" class="btn-ghost p-1 text-brand-red hover:text-brand-redHover" onclick="this.parentElement.remove(); checkEmptyPreviews()">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                `;
+                filePreviews.appendChild(preview);
+            });
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function checkEmptyPreviews() {
+            if (filePreviews.children.length === 0) {
+                filePreviews.classList.add('hidden');
+                dropContent.classList.remove('hidden');
+            }
+        }
+
+        // Form submission loading state
+        const form = document.getElementById('report-form');
+        const submitBtn = document.getElementById('submit-btn');
+        form.addEventListener('submit', () => {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Submitting...';
+            if (window.lucide) lucide.createIcons();
+        });
     });
 </script>
 {% endblock %}

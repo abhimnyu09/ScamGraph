@@ -143,8 +143,8 @@
         .loading-skeleton { background: linear-gradient(90deg, #111C2B 25%, #142335 50%, #111C2B 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
 
         /* Tab transitions */
-        .tab-panel { display: none; animation: fadeIn 0.2s ease-out; }
-        .tab-panel.active { display: block; }
+        .tab-panel, .tab-panel-scanner { display: none; animation: fadeIn 0.2s ease-out; }
+        .tab-panel.active, .tab-panel-scanner.active { display: block; }
 
         /* Score ring animation */
         .score-ring { transition: stroke-dashoffset 1s cubic-bezier(0.34, 1.56, 0.64, 1); }
@@ -155,31 +155,144 @@
 
         /* Input enhancement - FIXED for contrast */
         .input-field {
-            @apply w-full px-4 py-3 bg-bg-tertiary border border-surface-border text-text-primary placeholder:text-text-placeholder rounded-lg
-            transition-all duration-200 focus:ring-2 focus:ring-brand-emerald/50 focus:border-brand-emerald focus:bg-surface-secondary;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background-color: #111C2B !important;
+            border: 1px solid #263445 !important;
+            color: #F8FAFC !important;
+            border-radius: 0.5rem;
+            transition: all 200ms;
+            font-size: 1rem; /* Prevent zoom on iOS */
         }
-        .input-field:disabled { @apply opacity-50 cursor-not-allowed; }
-        .input-field::placeholder { color: #64748B; }
+        .input-field::placeholder { color: #64748B !important; }
+        .input-field:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.5), 0 0 0 4px #080D16 !important;
+            border-color: #10B981 !important;
+            background-color: #101827 !important;
+        }
+        .input-field:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #080D16 !important;
+        }
+        /* Ensure select elements also have proper contrast */
+        select.input-field {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394A3B8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+        /* Textarea specific */
+        textarea.input-field {
+            min-height: 100px;
+            resize: vertical;
+            line-height: 1.6;
+        }
 
         /* Button styles - FIXED for contrast */
         .btn-primary {
-            @apply px-6 py-3 bg-brand-emerald hover:bg-brand-emeraldHover active:bg-emerald-700 text-white font-semibold rounded-lg
-            transition-all duration-200 focus:ring-2 focus:ring-brand-emerald/50 focus:ring-offset-2 focus:ring-offset-bg-primary
-            disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2;
+            padding: 0.75rem 1.5rem;
+            background-color: #10B981;
+            color: white;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            transition: all 200ms;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            min-height: 44px;
         }
+        .btn-primary:hover { background-color: #059669; }
+        .btn-primary:active { background-color: #047857; transform: scale(0.98); }
+        .btn-primary:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.5), 0 0 0 4px #080D16;
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .btn-secondary {
-            @apply px-6 py-3 bg-surface-secondary hover:bg-surface-tertiary active:bg-surface-border text-text-primary font-semibold rounded-lg
-            border border-surface-border transition-all duration-200 focus:ring-2 focus:ring-surface-border focus:ring-offset-2 focus:ring-offset-bg-primary
-            disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2;
+            padding: 0.75rem 1.5rem;
+            background-color: #101827;
+            color: #F8FAFC;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            border: 1px solid #263445;
+            transition: all 200ms;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            text-decoration: none;
+            min-height: 44px;
         }
+        .btn-secondary:hover { background-color: #111C2B; }
+        .btn-secondary:active { background-color: #263445; transform: scale(0.98); }
+        .btn-secondary:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 2px #263445, 0 0 0 4px #080D16;
+        }
+        .btn-secondary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .btn-ghost {
-            @apply px-4 py-2 hover:bg-surface-secondary active:bg-surface-tertiary text-text-secondary hover:text-text-primary font-medium rounded-lg
-            transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2;
+            padding: 0.5rem 1rem;
+            color: #94A3B8;
+            font-weight: 500;
+            border-radius: 0.5rem;
+            transition: all 200ms;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            text-decoration: none;
+            background: transparent;
+            border: none;
+            min-height: 44px;
+        }
+        .btn-ghost:hover {
+            background-color: #101827;
+            color: #F8FAFC;
+        }
+        .btn-ghost:active { background-color: #111C2B; }
+        .btn-ghost:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 2px #263445, 0 0 0 4px #080D16;
+        }
+        .btn-ghost:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         /* Card styles */
-        .card { @apply bg-surface-card border border-surface-border rounded-xl shadow-card transition-all duration-300; }
-        .card-hover:hover { @apply shadow-card-hover border-surface-borderHover; }
+        .card {
+            background-color: #111C2B;
+            border: 1px solid #263445;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+            transition: all 300ms;
+        }
+        .card-hover:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
+            border-color: #2E3E52;
+        }
 
         /* Glass effect for modals */
         .glass { backdrop-filter: blur(12px); background: rgba(8, 13, 22, 0.9); }
@@ -198,11 +311,86 @@
         /* Link styles for better contrast */
         .link-primary { @apply text-brand-emerald hover:text-emerald-400 transition-colors; }
         .link-muted { @apply text-text-muted hover:text-text-secondary transition-colors; }
+
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            .input-field { border-width: 2px; }
+            .card { border-width: 2px; }
+            .btn-primary, .btn-secondary { border-width: 2px; }
+        }
+
+        /* Focus visible polyfill for older browsers */
+        .focus-visible:focus { outline: none; }
+        .focus-visible:focus-visible {
+            box-shadow: 0 0 0 2px #10B981, 0 0 0 4px #080D16;
+        }
+
+        /* Skip link for keyboard navigation */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: #10B981;
+            color: white;
+            padding: 8px 16px;
+            z-index: 100;
+            transition: top 0.2s;
+        }
+        .skip-link:focus { top: 0; }
+
+        /* Better form label styling */
+        label { display: block; }
+        label + .input-field { margin-top: 0.5rem; }
+
+        /* Toast/notification styles */
+        .toast {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            padding: 1rem 1.5rem;
+            background: #111C2B;
+            border: 1px solid #263445;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            animation: slideUp 0.3s ease-out;
+        }
+        .toast.success { border-color: #10B981; }
+        .toast.error { border-color: #EF4444; }
+        .toast.warning { border-color: #F59E0B; }
+
+        /* Mobile-first responsive utilities */
+        @media (max-width: 640px) {
+            .mobile-stack { flex-direction: column; }
+            .mobile-full { width: 100%; }
+            .mobile-text-center { text-align: center; }
+            .container { padding-left: 1rem; padding-right: 1rem; }
+        }
+
+        /* Print styles */
+        @media print {
+            .no-print { display: none !important; }
+            .card { box-shadow: none; border: 1px solid #263445; }
+            .btn-primary, .btn-secondary, .btn-ghost { display: none; }
+            body { background: white !important; color: black !important; }
+        }
     </style>
 
     {% block head %}{% endblock %}
 </head>
 <body class="bg-bg-primary text-text-primary min-h-screen antialiased">
+    <!-- Skip link for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <!-- Theme is always dark for JobScamScore style -->
     <script>
         // Force dark theme
@@ -211,53 +399,6 @@
     </script>
 
     {% block content %}{% endblock %}
-
-    <!-- Global Footer -->
-    <footer class="border-t border-surface-border py-8 px-4 mt-auto">
-        <div class="max-w-7xl mx-auto">
-            <div class="grid md:grid-cols-4 gap-8 mb-8">
-                <div>
-                    <h4 class="font-semibold text-text-primary mb-4">ScamGraph</h4>
-                    <p class="text-text-secondary text-sm leading-relaxed">
-                        Detect fake job postings before you apply. Built with ML-powered analysis and evidence-based verdicts.
-                    </p>
-                </div>
-                <div>
-                    <h4 class="font-semibold text-text-primary mb-4">Resources</h4>
-                    <ul class="space-y-2 text-sm text-text-secondary">
-                        <li><a href="#" class="link-muted">FTC Job Scam Alerts</a></li>
-                        <li><a href="#" class="link-muted">BBB Scam Tracker</a></li>
-                        <li><a href="#" class="link-muted">FBI IC3 Reports</a></li>
-                        <li><a href="#" class="link-muted">Red Flags Guide</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-semibold text-text-primary mb-4">Legal</h4>
-                    <ul class="space-y-2 text-sm text-text-secondary">
-                        <li><a href="#" class="link-muted">Privacy Policy</a></li>
-                        <li><a href="#" class="link-muted">Terms of Service</a></li>
-                        <li><a href="#" class="link-muted">Cookie Policy</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-semibold text-text-primary mb-4">Connect</h4>
-                    <ul class="space-y-2 text-sm text-text-secondary">
-                        <li><a href="https://github.com/abhimnyu09/ScamGraph" target="_blank" class="link-muted flex items-center gap-2"><i data-lucide="github" class="w-4 h-4"></i>GitHub</a></li>
-                        <li><a href="#" class="link-muted flex items-center gap-2"><i data-lucide="twitter" class="w-4 h-4"></i>Twitter</a></li>
-                        <li><a href="#" class="link-muted flex items-center gap-2"><i data-lucide="mail" class="w-4 h-4"></i>Contact</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="pt-6 border-t border-surface-border flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-text-muted">
-                <p>Analyzed securely over encrypted connection — we never contact the employer</p>
-                <p class="flex items-center gap-4">
-                    <span>Model: TF-IDF + XGBoost on 18K+ labeled postings</span>
-                    <span class="hidden sm:inline">•</span>
-                    <span class="hidden sm:inline">Built for HS 510</span>
-                </p>
-            </div>
-        </div>
-    </footer>
 
     <!-- Lucide icon initialization -->
     <script>

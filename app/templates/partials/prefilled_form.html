@@ -1,10 +1,10 @@
 <!-- Success message with extracted data -->
-<div class="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+<div class="mb-6 p-4 bg-brand-emeraldLight border border-brand-emerald/30 rounded-xl">
     <div class="flex items-start gap-3">
-        <i data-lucide="check-circle" class="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0"></i>
+        <i data-lucide="check-circle" class="w-5 h-5 text-brand-emerald mt-0.5 flex-shrink-0"></i>
         <div>
-            <p class="font-medium text-green-800 dark:text-green-200">Job details extracted successfully!</p>
-            <p class="text-sm text-green-700 dark:text-green-300 mt-1">Review the prefilled form below and click Analyze.</p>
+            <p class="font-medium text-text-primary">Job details extracted successfully!</p>
+            <p class="text-sm text-text-secondary mt-1">Review the prefilled form below and click Analyze.</p>
         </div>
     </div>
 </div>
@@ -14,80 +14,80 @@
     <input type="hidden" name="job_url" value="{{ url }}">
 
     <div class="space-y-4">
-        <h3 class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-            <i data-lucide="check-circle" class="w-4 h-4 text-risk-safe"></i>
+        <h3 class="text-sm font-semibold text-text-primary flex items-center gap-2">
+            <i data-lucide="check-circle" class="w-4 h-4 text-brand-emerald"></i>
             Extracted Details (Review & Edit)
         </h3>
 
         <div>
-            <label for="job_title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Job Title <span class="text-red-500">*</span>
+            <label for="job_title" class="block text-sm font-medium text-text-secondary mb-1">
+                Job Title <span class="text-brand-red">*</span>
             </label>
             <input type="text" name="job_title" id="job_title" required
                 value="{{ job_data.job_title }}"
-                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
+                class="input-field"
                 maxlength="200">
         </div>
 
         <div>
-            <label for="company_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Company Name <span class="text-red-500">*</span>
+            <label for="company_name" class="block text-sm font-medium text-text-secondary mb-1">
+                Company Name <span class="text-brand-red">*</span>
             </label>
             <input type="text" name="company_name" id="company_name" required
                 value="{{ job_data.company_name }}"
-                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
+                class="input-field"
                 maxlength="200">
         </div>
 
         <div>
-            <label for="job_description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Job Description <span class="text-red-500">*</span>
+            <label for="job_description" class="block text-sm font-medium text-text-secondary mb-1">
+                Job Description <span class="text-brand-red">*</span>
             </label>
             <textarea name="job_description" id="job_description" required rows="8"
-                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition font-mono text-sm"
+                class="input-field font-mono text-sm"
                 maxlength="20000">{{ job_data.job_description }}</textarea>
         </div>
     </div>
 
     <!-- Optional extracted fields -->
     {% if job_data.location or job_data.salary or job_data.employment_type or job_data.skills %}
-    <details class="group border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden open">
-        <summary class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 cursor-pointer list-none">
+    <details class="group border border-surface-border rounded-xl overflow-hidden open">
+        <summary class="flex items-center justify-between p-4 bg-bg-secondary cursor-pointer list-none">
             <div class="flex items-center gap-3">
-                <i data-lucide="sliders-horizontal" class="w-5 h-5 text-gray-500 dark:text-gray-400"></i>
-                <span class="font-medium text-gray-900 dark:text-white">Additional Extracted Info</span>
+                <i data-lucide="sliders-horizontal" class="w-5 h-5 text-text-muted"></i>
+                <span class="font-medium text-text-primary">Additional Extracted Info</span>
             </div>
-            <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform"></i>
+            <i data-lucide="chevron-down" class="w-5 h-5 text-text-muted group-open:rotate-180 transition-transform"></i>
         </summary>
-        <div class="p-4 space-y-4">
+        <div class="p-4 pt-0 space-y-4 border-t border-surface-border">
             {% if job_data.location %}
             <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Location</label>
+                <label class="block text-sm font-medium text-text-secondary mb-1">Location</label>
                 <input type="text" name="location" value="{{ job_data.location }}"
-                    class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition">
+                    class="input-field">
             </div>
             {% endif %}
             {% if job_data.salary %}
             <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Salary Mentioned</label>
+                <label class="block text-sm font-medium text-text-secondary mb-1">Salary Mentioned</label>
                 <input type="text" name="salary_text" value="{{ job_data.salary }}"
-                    class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition">
+                    class="input-field">
             </div>
             {% endif %}
             {% if job_data.employment_type %}
             <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Employment Type</label>
+                <label class="block text-sm font-medium text-text-secondary mb-1">Employment Type</label>
                 <input type="text" name="employment_type" value="{{ job_data.employment_type }}"
-                    class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition">
+                    class="input-field">
             </div>
             {% endif %}
             {% if job_data.skills %}
             <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Skills/Keywords</label>
+                <label class="block text-sm font-medium text-text-secondary mb-1">Skills/Keywords</label>
                 <input type="text" value="{{ job_data.skills }}"
-                    class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
+                    class="input-field"
                     readonly>
-                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">For reference — not used in analysis directly</p>
+                <p class="mt-1 text-xs text-text-muted">For reference — not used in analysis directly</p>
             </div>
             {% endif %}
         </div>
@@ -95,17 +95,17 @@
     {% endif %}
 
     <!-- Submit -->
-    <div class="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-800">
+    <div class="pt-4 border-t border-surface-border flex flex-col sm:flex-row items-center gap-4">
         <button type="submit"
-            class="w-full sm:w-auto px-8 py-3.5 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition disabled:opacity-50 flex items-center gap-2"
+            class="btn-primary flex-1 sm:flex-none justify-center group w-full sm:w-auto"
             id="analyze-btn">
-            <span id="submit-spinner" class="htmx-indicator">
-                <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                Analyzing...
-            </span>
-            <span class="htmx-indicator:hidden">
+            <span class="htmx-indicator:hidden flex items-center gap-2">
                 <i data-lucide="search" class="w-5 h-5"></i>
                 Analyze Job Posting
+            </span>
+            <span class="htmx-indicator flex items-center gap-2">
+                <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                Analyzing...
             </span>
         </button>
     </div>
