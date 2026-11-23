@@ -148,7 +148,7 @@ Research guidelines:
 
     try:
         response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",  # Groq free tier model (faster, smaller)
+            model="openai/gpt-oss-20b",  # Groq free tier model (open weight)
             messages=[
                 {"role": "system", "content": "You are a job scam detection expert. Return only valid JSON."},
                 {"role": "user", "content": prompt}
