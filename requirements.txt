@@ -28,4 +28,4 @@ pillow==10.4.0
 pytesseract==0.3.10
 
 # Kaggle (for dataset download)
-kagglehub==0.3.6# force rebuild
+kagglehub==0.3.6# force rebuild v2
