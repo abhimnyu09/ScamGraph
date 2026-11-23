@@ -136,7 +136,8 @@ Return ONLY valid JSON with these EXACT field names (use null if unknown, empty 
   "legitimate_signals": [{{"type": "category", "signal": "specific evidence", "severity": "positive"}}, ...],
   "final_recommendation": "detailed recommendation paragraph",
   "immediate_precautions": ["step1", "step2", ...],
-  "verification_steps": ["step1", "step2", ...]
+  "verification_steps": ["step1", "step2", ...],
+  "company_executive_summary": "2-3 paragraph detailed company analysis like JobScamScore - what they do, size, legitimacy signals, any red flags"
 }}
 
 RULES:
@@ -228,6 +229,7 @@ def predict_risk(
 
     # Company Research & Verification
     company_website = ai_get("company_website") or extract_company_website(company_name, job_description, job_url)
+    company_executive_summary = ai_get("company_executive_summary")
     domain_age = ai_get("domain_age") or estimate_domain_age(company_website) if company_website else None
     linkedin_company = ai_get("linkedin_company") or find_linkedin_company(company_name)
     glassdoor_company = ai_get("glassdoor_company") or find_glassdoor_company(company_name)
@@ -296,6 +298,7 @@ def predict_risk(
 
         # Company Research & Verification
         company_website=company_website,
+        company_executive_summary=company_executive_summary,
         domain_age=domain_age,
         linkedin_company=linkedin_company,
         glassdoor_company=glassdoor_company,

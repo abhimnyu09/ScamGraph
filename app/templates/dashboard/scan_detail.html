@@ -154,6 +154,12 @@
                 <i data-lucide="chevron-down" class="w-6 h-6 text-text-muted group-open:rotate-180 transition-transform"></i>
             </summary>
             <div class="px-6 pb-6 pt-0 space-y-4 border-t border-surface-border">
+                {% if scan.company_executive_summary %}
+                <div class="p-4 bg-surface-tertiary border border-surface-border rounded-lg">
+                    <label class="text-xs font-medium text-text-muted uppercase tracking-wide mb-2 block">Company Overview</label>
+                    <p class="text-sm text-text-secondary leading-relaxed">{{ scan.company_executive_summary }}</p>
+                </div>
+                {% endif %}
                 <div class="grid sm:grid-cols-2 gap-4">
                     <div>
                         <label class="text-xs font-medium text-text-muted uppercase tracking-wide">Official Website</label>

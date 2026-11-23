@@ -71,6 +71,7 @@ def init_db():
             created_at TEXT DEFAULT CURRENT_TIMESTAMP,
             -- Detailed analysis fields (Phase 4)
             company_website TEXT,
+            company_executive_summary TEXT,
             domain_age INTEGER,
             linkedin_company TEXT,
             glassdoor_company TEXT,
@@ -211,7 +212,7 @@ def save_scan_to_history(user_id: str, scan_data: dict):
         INSERT INTO scan_history
         (id, user_id, job_title, company_name, risk_score, risk_tier, summary,
          job_url, recruiter_email, checks, raw_text, timestamp,
-         company_website, domain_age, linkedin_company, glassdoor_company,
+         company_website, company_executive_summary, domain_age, linkedin_company, glassdoor_company,
          company_registration_status, domain_ownership_status, physical_address_status,
          years_operation_status, company_locations, job_location, user_location,
          work_type, location_match_status, location_match_details, location_analysis_notes,
@@ -222,7 +223,7 @@ def save_scan_to_history(user_id: str, scan_data: dict):
          suspicious_phrases, urgency_language, grammar_examples, content_assessment,
          suspicious_signals, legitimate_signals, final_recommendation,
          immediate_precautions, verification_steps)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         scan_id,
         user_id,
@@ -238,6 +239,7 @@ def save_scan_to_history(user_id: str, scan_data: dict):
         timestamp,
         # Company Research
         scan_data.get("company_website"),
+        scan_data.get("company_executive_summary"),
         scan_data.get("domain_age"),
         scan_data.get("linkedin_company"),
         scan_data.get("glassdoor_company"),
@@ -847,6 +849,7 @@ async def analyze_form(request: Request):
             "raw_text": raw_text or "",
             # Company Research & Verification
             "company_website": result.company_website,
+            "company_executive_summary": result.company_executive_summary,
             "domain_age": result.domain_age,
             "linkedin_company": result.linkedin_company,
             "glassdoor_company": result.glassdoor_company,

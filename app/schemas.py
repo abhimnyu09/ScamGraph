@@ -21,6 +21,7 @@ class AnalysisResult(BaseModel):
 
     # Company Research & Verification
     company_website: Optional[str] = None
+    company_executive_summary: Optional[str] = None
     domain_age: Optional[int] = None
     linkedin_company: Optional[str] = None
     glassdoor_company: Optional[str] = None
