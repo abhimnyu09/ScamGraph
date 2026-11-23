@@ -12,17 +12,17 @@ from app.features.text_features import extract_text_features, load_vectorizers
 from app.features.handcrafted import extract_handcrafted_features, get_feature_names
 from app.schemas import CheckResult, AnalysisResult
 
-# --- OpenAI Client (lazy init) ---
-_openai_client = None
+# --- Groq Client (lazy init) ---
+_groq_client = None
 
-def get_openai_client():
-    global _openai_client
-    if _openai_client is None:
-        api_key = os.environ.get("OPENAI_API_KEY")
+def get_groq_client():
+    global _groq_client
+    if _groq_client is None:
+        api_key = os.environ.get("GROQ_API_KEY")
         if api_key:
-            from openai import OpenAI
-            _openai_client = OpenAI(api_key=api_key)
-    return _openai_client
+            from groq import Groq
+            _groq_client = Groq(api_key=api_key)
+    return _groq_client
 
 
 # --- Paths ---
@@ -61,7 +61,7 @@ def get_metrics() -> Dict[str, Any]:
     return _metrics
 
 
-# --- AI Research Agent (OpenAI) ---
+# --- AI Research Agent (Groq) ---
 def enrich_with_ai_research(
     job_title: str,
     company_name: str,
@@ -75,10 +75,10 @@ def enrich_with_ai_research(
     risk_tier: str
 ) -> Dict[str, Any]:
     """
-    Use OpenAI to research company and enrich analysis with real data.
+    Use Groq (Llama-3.1-70B) to research company and enrich analysis with real data.
     Returns dict with all detailed analysis fields.
     """
-    client = get_openai_client()
+    client = get_groq_client()
     if not client:
         return {}  # No API key, fallback to stubs
 
@@ -148,7 +148,7 @@ Research guidelines:
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini",  # Fast, cheap, smart enough
+            model="llama-3.1-70b-versatile",  # Groq's best free model
             messages=[
                 {"role": "system", "content": "You are a job scam detection expert. Return only valid JSON."},
                 {"role": "user", "content": prompt}

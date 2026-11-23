@@ -16,7 +16,7 @@ services:
         sync: false
       - key: GOOGLE_REDIRECT_URI
         sync: false
-      - key: OPENAI_API_KEY
+      - key: GROQ_API_KEY
         sync: false
     autoDeploy: true
     healthCheckPath: /health
