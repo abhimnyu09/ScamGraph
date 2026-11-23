@@ -220,6 +220,7 @@ def save_scan_to_history(user_id: str, scan_data: dict):
         INSERT INTO scan_history
         (id, user_id, job_title, company_name, risk_score, risk_tier, summary,
          job_url, recruiter_email, checks, raw_text, timestamp,
+         created_at,
          company_website, company_executive_summary, domain_age, linkedin_company, glassdoor_company,
          company_registration_status, domain_ownership_status, physical_address_status,
          years_operation_status, company_locations, job_location, user_location,
@@ -245,6 +246,7 @@ def save_scan_to_history(user_id: str, scan_data: dict):
         checks_json,
         scan_data.get("raw_text", ""),
         timestamp,
+        timestamp,  # created_at
         # Company Research
         scan_data.get("company_website"),
         scan_data.get("company_executive_summary"),
