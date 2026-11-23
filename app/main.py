@@ -835,12 +835,62 @@ async def analyze_form(request: Request):
             "risk_score": result.risk_score,
             "risk_tier": result.risk_tier,
             "summary": result.summary,
+            "recommendation": result.recommendation,
             "job_url": job_url or "",
             "recruiter_email": recruiter_email or "",
+            "recruiter_phone": recruiter_phone or "",
+            "recruiter_name": result.recruiter_name,
             "checks": [
                 {"name": c.name, "status": c.check_status, "message": c.message, "weight": c.weight}
                 for c in result.checks
-            ]
+            ],
+            "raw_text": raw_text or "",
+            # Company Research & Verification
+            "company_website": result.company_website,
+            "domain_age": result.domain_age,
+            "linkedin_company": result.linkedin_company,
+            "glassdoor_company": result.glassdoor_company,
+            "company_registration_status": result.company_registration_status,
+            "domain_ownership_status": result.domain_ownership_status,
+            "physical_address_status": result.physical_address_status,
+            "years_operation_status": result.years_operation_status,
+            # Location Verification
+            "company_locations": result.company_locations,
+            "job_location": result.job_location,
+            "user_location": location or "",
+            "work_type": result.work_type,
+            "location_match_status": result.location_match_status,
+            "location_match_details": result.location_match_details,
+            "location_analysis_notes": result.location_analysis_notes,
+            # Contact Verification
+            "email_domain_verified": result.email_domain_verified,
+            "recruiter_linkedin": result.recruiter_linkedin,
+            "linkedin_verified": result.linkedin_verified,
+            "directory_match": result.directory_match,
+            "official_channel": result.official_channel,
+            # Salary & Job Verification
+            "salary_text": salary_text or "",
+            "salary_benchmark": result.salary_benchmark,
+            "responsibilities": result.responsibilities,
+            "requirements": result.requirements,
+            "salary_in_range": result.salary_in_range,
+            "no_unrealistic_salary": result.no_unrealistic_salary,
+            "clear_structure": result.clear_structure,
+            "job_structure_complete": result.job_structure_complete,
+            # Grammar & Content Analysis
+            "grammar_errors": result.grammar_errors,
+            "spacing_issues": result.spacing_issues,
+            "suspicious_phrases": result.suspicious_phrases,
+            "urgency_language": result.urgency_language,
+            "grammar_examples": result.grammar_examples,
+            "content_assessment": result.content_assessment,
+            # Scam/Legit Pattern Detection
+            "suspicious_signals": result.suspicious_signals,
+            "legitimate_signals": result.legitimate_signals,
+            # Final Recommendations
+            "final_recommendation": result.final_recommendation,
+            "immediate_precautions": result.immediate_precautions,
+            "verification_steps": result.verification_steps,
         }
         save_scan_to_history(user["id"], scan_data)
 
