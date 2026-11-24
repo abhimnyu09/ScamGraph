@@ -593,7 +593,7 @@ async def register_post(request: Request):
         "created_at": datetime.utcnow().isoformat(),
         "onboarded": False,
         "scans_used": 0,
-        "scans_limit": 100,
+        "scans_limit": 10,
         "plan_name": "FREE PLAN",
         "preferences": {
             "email_notifications": True,
@@ -756,7 +756,7 @@ async def google_callback(request: Request):
                 "created_at": datetime.utcnow().isoformat(),
                 "onboarded": False,
                 "scans_used": 0,
-                "scans_limit": 100,
+                "scans_limit": 10,
                 "plan_name": "FREE PLAN",
                 "preferences": {
                     "email_notifications": True,
