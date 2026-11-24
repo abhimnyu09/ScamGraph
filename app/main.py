@@ -841,6 +841,17 @@ async def analyze_form(request: Request):
     # Save to history if user is authenticated
     user = get_user_from_session(request)
     if user:
+        # Check scan limit
+        scans_used = user.get("scans_used", 0)
+        scans_limit = user.get("scans_limit", 10)
+        if scans_used >= scans_limit:
+            return templates.TemplateResponse("partials/result_card.html", {
+                "request": request,
+                "result": None,
+                "user": user,
+                "error": f"Monthly scan limit reached ({scans_limit} scans). Upgrade for more scans."
+            }, status_code=429)
+
         scan_data = {
             "job_title": job_title,
             "company_name": company_name,
@@ -912,6 +923,13 @@ async def analyze_form(request: Request):
 
 async def analyze_json(request: Request):
     """Analyze job posting via JSON API."""
+    user = get_user_from_session(request)
+    if user:
+        scans_used = user.get("scans_used", 0)
+        scans_limit = user.get("scans_limit", 10)
+        if scans_used >= scans_limit:
+            return JSONResponse({"error": f"Monthly scan limit reached ({scans_limit} scans). Upgrade for more scans."}, status_code=429)
+
     data = await request.json()
 
     # Validate manually
