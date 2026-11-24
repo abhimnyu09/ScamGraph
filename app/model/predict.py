@@ -203,8 +203,8 @@ RULES:
   "urgency_language": integer,
   "grammar_examples": ["example1", "example2"],
   "content_assessment": "assessment or null",
-  "suspicious_signals": [{"type": "cat", "signal": "evidence", "severity": "critical|high|medium"}],
-  "legitimate_signals": [{"type": "cat", "signal": "evidence", "severity": "positive"}],
+  "suspicious_signals": [{{"type": "cat", "signal": "evidence", "severity": "critical|high|medium"}}],
+  "legitimate_signals": [{{"type": "cat", "signal": "evidence", "severity": "positive"}}],
   "final_recommendation": "recommendation or null",
   "immediate_precautions": ["step1", "step2"],
   "verification_steps": ["step1", "step2"]
